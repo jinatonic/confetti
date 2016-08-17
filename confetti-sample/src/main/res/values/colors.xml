@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="gold_dark">#946335</color>
+    <color name="gold_med">#ab804b</color>
+    <color name="gold">#cea774</color>
+    <color name="gold_light">#edd3b2</color>
+
+    <color name="colorPrimary">@color/gold</color>
+    <color name="colorPrimaryDark">@color/gold_dark</color>
+    <color name="colorAccent">@color/gold_med</color>
+</resources>

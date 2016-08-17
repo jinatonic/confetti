@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="default_confetti_size">8dp</dimen>
+
+    <dimen name="default_velocity_slow">50dp</dimen>
+    <dimen name="default_velocity_normal">100dp</dimen>
+    <dimen name="default_velocity_fast">200dp</dimen>
+
+    <dimen name="default_maximum_velocity_y">200dp</dimen>
+</resources>

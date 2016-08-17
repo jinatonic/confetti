@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Default accelerationX, num dp per second-->
+    <dimen name="default_acceleration_x_dp_per_second">0dp</dimen>
+    <!-- Default accelerationY, num dp per second -->
+    <dimen name="default_acceleration_y_dp_per_second">0.5dp</dimen>
+</resources>
