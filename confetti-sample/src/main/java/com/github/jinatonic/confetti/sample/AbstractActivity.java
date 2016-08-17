@@ -21,13 +21,14 @@ public abstract class AbstractActivity extends AppCompatActivity implements
 
     private int confettiSize;
     protected float velocitySlow, velocityNormal, velocityFast;
+    protected float defaultMaximumVelocityY;
     private int[] colors;
     private List<Bitmap> bitmaps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_confetti);
 
         container = (ViewGroup) findViewById(R.id.container);
         findViewById(R.id.generate_confetti_btn).setOnClickListener(this);
@@ -37,6 +38,7 @@ public abstract class AbstractActivity extends AppCompatActivity implements
         velocitySlow = res.getDimensionPixelSize(R.dimen.default_velocity_slow);
         velocityNormal = res.getDimensionPixelSize(R.dimen.default_velocity_normal);
         velocityFast = res.getDimensionPixelSize(R.dimen.default_velocity_fast);
+        defaultMaximumVelocityY = res.getDimensionPixelOffset(R.dimen.default_maximum_velocity_y);
 
         colors = new int[] {
                 res.getColor(R.color.gold_dark),

@@ -1,23 +1,57 @@
 package com.github.jinatonic.confetti.sample;
 
-import android.content.res.Resources;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
-import com.github.jinatonic.confetti.ConfettiManager;
+public class MainActivity extends AppCompatActivity {
 
-public class MainActivity extends AbstractActivity {
+    private static final ConfettiSample[] SAMPLES = {
+            new ConfettiSample(R.string.showering_confetti, ShoweringConfettiActivity.class),
+    };
+
     @Override
-    public void onClick(View view) {
-        final Resources res = getResources();
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        new ConfettiManager(res, this, 300)
-                .setDuration(3000)
-                .setVelocityX(0, velocityNormal)
-                .setVelocityY(velocityNormal, 0f)
-                .setAccelerationY(0f, 0f)
-                .setMaximumVelocityY(res.getDimension(R.dimen.default_maximum_velocity_y))
-                .setRotationalAcceleration(360, 180)
-                .setMaximumRotationalVelocity(360)
-                .show(new ConfettiManager.ConfettiSource(0, 0, container.getWidth(), 0), container);
+        final ListView listView = (ListView) findViewById(android.R.id.list);
+        final ListAdapter adapter = new ArrayAdapter<ConfettiSample>(this,
+                R.layout.item_confetti_sample, SAMPLES) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                final View view = super.getView(position, convertView, parent);
+                final ConfettiSample sample = getItem(position);
+                ((TextView) view).setText(sample.nameResId);
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(MainActivity.this, sample.targetActivityClass));
+                    }
+                });
+
+                return view;
+            }
+        };
+
+        listView.setAdapter(adapter);
+    }
+
+    private static class ConfettiSample {
+        final int nameResId;
+        final Class<? extends Activity> targetActivityClass;
+
+        private ConfettiSample(int nameResId, Class<? extends Activity> targetActivityClass) {
+            this.nameResId = nameResId;
+            this.targetActivityClass = targetActivityClass;
+        }
     }
 }

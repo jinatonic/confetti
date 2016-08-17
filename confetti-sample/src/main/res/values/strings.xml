@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Confetti Sample</string>
+
+    <string name="showering_confetti">Showering confetti</string>
 </resources>
