@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="default_confetti_size">8dp</dimen>
+    <dimen name="default_confetti_size">6dp</dimen>
 
     <dimen name="default_velocity_slow">50dp</dimen>
     <dimen name="default_velocity_normal">100dp</dimen>

@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Confetti Sample</string>
-    <string name="generate_confetti_action">Generate confetti!</string>
+    <string name="generate_confetti_once">Once</string>
+    <string name="generate_confetti_stream">Stream</string>
+    <string name="generate_confetti_infinite">Infinite</string>
 
     <string name="showering_confetti">Showering confetti</string>
 </resources>

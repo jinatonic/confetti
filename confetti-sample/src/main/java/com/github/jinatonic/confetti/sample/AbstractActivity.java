@@ -31,7 +31,9 @@ public abstract class AbstractActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_confetti);
 
         container = (ViewGroup) findViewById(R.id.container);
-        findViewById(R.id.generate_confetti_btn).setOnClickListener(this);
+        findViewById(R.id.generate_confetti_once_btn).setOnClickListener(this);
+        findViewById(R.id.generate_confetti_stream_btn).setOnClickListener(this);
+        findViewById(R.id.generate_confetti_infinite_btn).setOnClickListener(this);
 
         final Resources res = getResources();
         confettiSize = res.getDimensionPixelSize(R.dimen.default_confetti_size);
@@ -48,6 +50,22 @@ public abstract class AbstractActivity extends AppCompatActivity implements
         };
         bitmaps = Utils.generateConfettiBitmaps(colors, confettiSize);
     }
+
+    @Override
+    public void onClick(View view) {
+        final int id = view.getId();
+        if (id == R.id.generate_confetti_once_btn) {
+            generateOnce();
+        } else if (id == R.id.generate_confetti_stream_btn) {
+            generateStream();
+        } else {
+            generateInfinite();
+        }
+    }
+
+    protected abstract void generateOnce();
+    protected abstract void generateStream();
+    protected abstract void generateInfinite();
 
     @Override
     public Confetto generateConfetto(Random random) {

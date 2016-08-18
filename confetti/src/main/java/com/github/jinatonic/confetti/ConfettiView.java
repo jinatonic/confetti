@@ -2,6 +2,7 @@ package com.github.jinatonic.confetti;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,13 @@ public class ConfettiView extends View implements View.OnLayoutChangeListener {
         final ConfettiView confettiView = new ConfettiView(context, null);
         confettiView.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            final int defaultElevation = context.getResources().getDimensionPixelOffset(
+                    R.dimen.confetti_default_elevation);
+            confettiView.setElevation(defaultElevation);
+        }
+
         return confettiView;
     }
 
@@ -68,6 +76,7 @@ public class ConfettiView extends View implements View.OnLayoutChangeListener {
                 final ViewGroup vg = (ViewGroup) parent;
                 vg.removeViewInLayout(this);
                 vg.removeOnLayoutChangeListener(this);
+                vg.invalidate();
             }
         }
     }

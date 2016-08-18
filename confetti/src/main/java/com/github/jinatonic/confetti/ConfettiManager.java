@@ -390,6 +390,7 @@ public class ConfettiManager {
         if (animator != null) {
             animator.cancel();
         }
+        lastEmittedTimestamp = 0;
 
         attachConfettiViewToParent();
 
