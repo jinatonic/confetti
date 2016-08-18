@@ -513,6 +513,10 @@ public class ConfettiManager {
 
     /**
      * The source from which confetti will appear. This can be either a line or a point.
+     *
+     * <p>Please note that the specified source represents the top left corner of the drawn
+     * confetti. If you want the confetti to appear from off-screen, you'll have to offset it
+     * with the confetti's size.
      */
     public static class ConfettiSource {
         public final int x0, y0, x1, y1;

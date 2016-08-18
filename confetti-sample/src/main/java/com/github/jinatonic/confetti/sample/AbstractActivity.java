@@ -19,7 +19,7 @@ public abstract class AbstractActivity extends AppCompatActivity implements
         ConfettiManager.ConfettoGenerator, View.OnClickListener {
     protected ViewGroup container;
 
-    private int confettiSize;
+    protected int confettiSize;
     protected float velocitySlow, velocityNormal, velocityFast;
     protected float defaultMaximumVelocityY;
     private int[] colors;

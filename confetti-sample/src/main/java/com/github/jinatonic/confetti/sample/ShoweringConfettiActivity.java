@@ -7,9 +7,8 @@ import com.github.jinatonic.confetti.ConfettiManager;
 public class ShoweringConfettiActivity extends AbstractActivity {
     @Override
     public void onClick(View view) {
-        // TODO: it feels like the confetti is appearing out of thin air on top
         final ConfettiManager.ConfettiSource confettiSource = new ConfettiManager.ConfettiSource(
-                0, 0, container.getWidth(), 0);
+                0, -confettiSize, container.getWidth(), -confettiSize);
         new ConfettiManager(this, this, confettiSource, container)
                 .setEmissionDuration(3000)
                 .setEmissionRate(100)
