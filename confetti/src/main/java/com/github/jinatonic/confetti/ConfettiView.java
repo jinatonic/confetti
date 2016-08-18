@@ -2,14 +2,12 @@ package com.github.jinatonic.confetti;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Rect;
-import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
-import com.github.jinatonic.confetti.confetti.Confetti;
+import com.github.jinatonic.confetti.confetto.Confetto;
 
 import java.util.List;
 
@@ -19,9 +17,7 @@ import java.util.List;
  * it will automatically remove itself from the parent.
  */
 public class ConfettiView extends View implements View.OnLayoutChangeListener {
-    private List<Confetti> confettiList;
-    private Rect bound;
-    private long animateStartTime;
+    private List<Confetto> confetti;
     private boolean terminated;
 
     public static ConfettiView newInstance(Context context) {
@@ -35,18 +31,8 @@ public class ConfettiView extends View implements View.OnLayoutChangeListener {
         super(context, attrs);
     }
 
-    /**
-     * Starts the animation specified by the list of confettis and the bound.
-     *
-     * @param confettiList the list of confettis to animate.
-     * @param bound the bound in which the confetti must reside in.
-     */
-    public void animate(List<Confetti> confettiList, Rect bound) {
-        this.confettiList = confettiList;
-        this.bound = bound;
-        this.animateStartTime = SystemClock.elapsedRealtime();
-        this.terminated = false;
-        invalidate();
+    public void bind(List<Confetto> confetti) {
+        this.confetti = confetti;
     }
 
     /**
@@ -65,6 +51,12 @@ public class ConfettiView extends View implements View.OnLayoutChangeListener {
         final ViewGroup parent = (ViewGroup) getParent();
         parent.removeOnLayoutChangeListener(this);
         parent.addOnLayoutChangeListener(this);
+
+        // If we did not bind before attaching to the window, that means this ConfettiView no longer
+        // has a ConfettiManager backing it and should just be terminated.
+        if (confetti == null) {
+            terminate();
+        }
     }
 
     @Override
@@ -85,27 +77,11 @@ public class ConfettiView extends View implements View.OnLayoutChangeListener {
         super.onDraw(canvas);
 
         if (!terminated) {
-            final long elapsedTime = SystemClock.elapsedRealtime() - animateStartTime;
-            final int width = getWidth();
-            final int height = getHeight();
-            boolean terminated = true;
-
             canvas.save();
-            canvas.clipRect(bound);
-            for (Confetti confetti : confettiList) {
-                // TODO: this should take in bounds to better determine if animation is terminated
-                terminated &= confetti.applyUpdate(elapsedTime, width, height);
-                confetti.draw(canvas);
+            for (Confetto confetto : this.confetti) {
+                confetto.draw(canvas);
             }
             canvas.restore();
-
-            this.terminated |= terminated;
-
-            if (!terminated) {
-                invalidate();
-            } else {
-                getParent().requestLayout();
-            }
         }
     }
 }

@@ -1,15 +1,16 @@
-package com.github.jinatonic.confetti.confetti;
+package com.github.jinatonic.confetti.confetto;
 
 import android.graphics.Canvas;
 import android.graphics.Interpolator;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Rect;
 
 /**
- * Abstract class that represents a single confetti on the screen. This class holds all of the
- * internal states for the confetti to help it animate.
+ * Abstract class that represents a single confetto on the screen. This class holds all of the
+ * internal states for the confetto to help it animate.
  */
-public abstract class Confetti {
+public abstract class Confetto {
     private final Matrix matrix = new Matrix();
     private final Paint workPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
@@ -38,8 +39,8 @@ public abstract class Confetti {
     private boolean startedAnimation, terminated;
 
     /**
-     * This method should be called after all of the confetti's state variables are configured
-     * and before the confetti gets animated.
+     * This method should be called after all of the confetto's state variables are configured
+     * and before the confetto gets animated.
      */
     protected void prepare() {
         millisToReachMaximumVelocityX = (long)
@@ -57,12 +58,13 @@ public abstract class Confetti {
     }
 
     /**
-     * Update the confetti internal state based on the provided passed time.
+     * Update the confetto internal state based on the provided passed time.
      *
      * @param passedTime time since the beginning of the animation.
-     * @return whether this particular confetti has terminated.
+     * @param bound the space in which the confetto can display in.
+     * @return whether this particular confetto has terminated.
      */
-    public boolean applyUpdate(long passedTime, int canvasWidth, int canvasHeight) {
+    public boolean applyUpdate(long passedTime, Rect bound) {
         passedTime -= initialDelay;
         startedAnimation = passedTime >= 0;
 
@@ -76,7 +78,8 @@ public abstract class Confetti {
                     initialRotationalVelocity, rotationalAcceleration,
                     millisToReachMaximumRotationalVelocity, maximumRotationalVelocity);
 
-            terminated = currentX >= canvasWidth || currentY >= canvasHeight;
+            // TODO fix this
+            terminated = currentX >= bound.width() || currentY >= bound.height();
         }
 
         return terminated;
@@ -96,7 +99,7 @@ public abstract class Confetti {
     }
 
     /**
-     * Primary method for rendering this confetti on the canvas.
+     * Primary method for rendering this confetto on the canvas.
      *
      * @param canvas the canvas to draw on.
      */
@@ -109,15 +112,15 @@ public abstract class Confetti {
 
     /**
      * Subclasses need to override this method to optimize for the way to draw the appropriate
-     * confetti on the canvas.
+     * confetto on the canvas.
      *
      * @param canvas the canvas to draw on.
      * @param matrix an identity matrix to use for draw manipulations.
      * @param paint the paint to perform canvas draw operations on. This paint has already been
      *              configured via {@link #configurePaint(Paint)}.
-     * @param x the x position of the confetti relative to the canvas.
-     * @param y the y position of the confetti relative to the canvas.
-     * @param rotation the rotation (in degrees) to draw the confetti.
+     * @param x the x position of the confetto relative to the canvas.
+     * @param y the y position of the confetto relative to the canvas.
+     * @param rotation the rotation (in degrees) to draw the confetto.
      */
     protected abstract void drawInternal(Canvas canvas, Matrix matrix, Paint paint, float x,
             float y, float rotation);
@@ -127,103 +130,103 @@ public abstract class Confetti {
      * The primary purpose of this is to better visualize the values you are setting.
      */
     public static class Configurator {
-        private Confetti confetti;
+        private Confetto confetto;
 
-        public Configurator setConfetti(Confetti confetti) {
-            this.confetti = confetti;
+        public Configurator setConfetto(Confetto confetto) {
+            this.confetto = confetto;
 
             // Reset everything to default value
-            confetti.initialDelay = 0f;
-            confetti.initialX = confetti.initialY = 0f;
-            confetti.initialVelocityX = confetti.initialVelocityY = 0f;
-            confetti.accelerationX = confetti.accelerationY = 0f;
-            confetti.maximumVelocityX = confetti.maximumVelocityY = 0f;
-            confetti.initialRotation = 0f;
-            confetti.initialRotationalVelocity = confetti.rotationalAcceleration = 0f;
-            confetti.maximumRotationalVelocity = 0f;
+            confetto.initialDelay = 0f;
+            confetto.initialX = confetto.initialY = 0f;
+            confetto.initialVelocityX = confetto.initialVelocityY = 0f;
+            confetto.accelerationX = confetto.accelerationY = 0f;
+            confetto.maximumVelocityX = confetto.maximumVelocityY = 0f;
+            confetto.initialRotation = 0f;
+            confetto.initialRotationalVelocity = confetto.rotationalAcceleration = 0f;
+            confetto.maximumRotationalVelocity = 0f;
 
             return this;
         }
 
         public Configurator setInitialDelay(float val) {
-            confetti.initialDelay = val;
+            confetto.initialDelay = val;
             return this;
         }
 
         public Configurator setInitialX(float val) {
-            confetti.initialX = val;
+            confetto.initialX = val;
             return this;
         }
 
         public Configurator setInitialY(float val) {
-            confetti.initialY = val;
+            confetto.initialY = val;
             return this;
         }
 
         public Configurator setInitialVelocityX(float val) {
-            confetti.initialVelocityX = val;
+            confetto.initialVelocityX = val;
             return this;
         }
 
         public Configurator setInitialVelocityY(float val) {
-            confetti.initialVelocityY = val;
+            confetto.initialVelocityY = val;
             return this;
         }
 
         public Configurator setAccelerationX(float val) {
-            confetti.accelerationX = val;
+            confetto.accelerationX = val;
             return this;
         }
 
         public Configurator setAccelerationY(float val) {
-            confetti.accelerationY = val;
+            confetto.accelerationY = val;
             return this;
         }
 
         public Configurator setMaximumVelocityX(float val) {
-            confetti.maximumVelocityX = val;
+            confetto.maximumVelocityX = val;
             return this;
         }
 
         public Configurator setMaximumVelocityY(float val) {
-            confetti.maximumVelocityY = val;
+            confetto.maximumVelocityY = val;
             return this;
         }
 
         public Configurator setInitialRotation(float val) {
-            confetti.initialRotation = val;
+            confetto.initialRotation = val;
             return this;
         }
 
         public Configurator setInitialRotationalVelocity(float val) {
-            confetti.initialRotationalVelocity = val;
+            confetto.initialRotationalVelocity = val;
             return this;
         }
 
         public Configurator setRotationalAcceleration(float val) {
-            confetti.rotationalAcceleration = val;
+            confetto.rotationalAcceleration = val;
             return this;
         }
 
         public Configurator setMaximumRotationalVelocity(float val) {
-            confetti.maximumRotationalVelocity = val;
+            confetto.maximumRotationalVelocity = val;
             return this;
         }
 
         public Configurator setTTL(long val) {
-            confetti.ttl = val;
+            confetto.ttl = val;
             return this;
         }
 
         public Configurator setFadeOut(boolean fadeOut, Interpolator fadeOutInterpolator) {
-            confetti.fadeOut = fadeOut;
-            confetti.fadeOutInterpolator = fadeOutInterpolator;
+            confetto.fadeOut = fadeOut;
+            confetto.fadeOutInterpolator = fadeOutInterpolator;
             return this;
         }
 
-        public Confetti configure() {
-            confetti.prepare();
-            return confetti;
+        public Confetto configure() {
+            confetto.prepare();
+            return confetto;
         }
     }
 }

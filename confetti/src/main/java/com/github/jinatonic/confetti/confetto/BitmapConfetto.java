@@ -1,15 +1,15 @@
-package com.github.jinatonic.confetti.confetti;
+package com.github.jinatonic.confetti.confetto;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 
-public class BitmapConfetti extends Confetti {
+public class BitmapConfetto extends Confetto {
     private final Bitmap bitmap;
     private final float bitmapCenterX, bitmapCenterY;
 
-    public BitmapConfetti(Bitmap bitmap) {
+    public BitmapConfetto(Bitmap bitmap) {
         this.bitmap = bitmap;
         this.bitmapCenterX = bitmap.getWidth() / 2f;
         this.bitmapCenterY = bitmap.getHeight() / 2f;

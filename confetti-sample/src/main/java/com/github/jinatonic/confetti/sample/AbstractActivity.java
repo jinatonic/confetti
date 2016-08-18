@@ -9,14 +9,14 @@ import android.view.ViewGroup;
 
 import com.github.jinatonic.confetti.ConfettiManager;
 import com.github.jinatonic.confetti.Utils;
-import com.github.jinatonic.confetti.confetti.BitmapConfetti;
-import com.github.jinatonic.confetti.confetti.Confetti;
+import com.github.jinatonic.confetti.confetto.BitmapConfetto;
+import com.github.jinatonic.confetti.confetto.Confetto;
 
 import java.util.List;
 import java.util.Random;
 
 public abstract class AbstractActivity extends AppCompatActivity implements
-        ConfettiManager.ConfettiGenerator, View.OnClickListener {
+        ConfettiManager.ConfettoGenerator, View.OnClickListener {
     protected ViewGroup container;
 
     private int confettiSize;
@@ -50,7 +50,7 @@ public abstract class AbstractActivity extends AppCompatActivity implements
     }
 
     @Override
-    public Confetti generateConfetti(Random random) {
-        return new BitmapConfetti(bitmaps.get(random.nextInt(bitmaps.size())));
+    public Confetto generateConfetto(Random random) {
+        return new BitmapConfetto(bitmaps.get(random.nextInt(bitmaps.size())));
     }
 }

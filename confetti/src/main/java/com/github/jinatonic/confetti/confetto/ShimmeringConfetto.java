@@ -1,4 +1,4 @@
-package com.github.jinatonic.confetti.confetti;
+package com.github.jinatonic.confetti.confetto;
 
 import android.animation.ArgbEvaluator;
 import android.graphics.Bitmap;
@@ -12,13 +12,13 @@ import android.os.SystemClock;
 
 import java.util.Random;
 
-public class ShimmeringConfetti extends BitmapConfetti {
+public class ShimmeringConfetto extends BitmapConfetto {
     private final ArgbEvaluator evaluator = new ArgbEvaluator();
     private final int fromColor, toColor;
     private final long waveLength, halfWaveLength;
     private final long randomStart;
 
-    public ShimmeringConfetti(Bitmap bitmap, int fromColor, int toColor, long waveLength,
+    public ShimmeringConfetto(Bitmap bitmap, int fromColor, int toColor, long waveLength,
             Random random) {
         super(bitmap);
         this.fromColor = fromColor;
