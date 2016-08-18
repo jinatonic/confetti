@@ -10,6 +10,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
         android:padding="16dp"
-        android:text="Generate confetti!" />
+        android:text="@string/generate_confetti_action" />
 
 </FrameLayout>

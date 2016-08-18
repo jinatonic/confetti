@@ -53,6 +53,31 @@ public abstract class Confetto {
         configurePaint(workPaint);
     }
 
+    protected void reset() {
+        initialDelay = 0f;
+        initialX = initialY = 0f;
+        initialVelocityX = initialVelocityY = 0f;
+        accelerationX = accelerationY = 0f;
+        maximumVelocityX = maximumVelocityY = 0f;
+        millisToReachMaximumVelocityX = millisToReachMaximumVelocityY = 0;
+
+        initialRotation = 0f;
+        initialRotationalVelocity = 0f;
+        rotationalAcceleration = 0f;
+        maximumRotationalVelocity = 0f;
+        millisToReachMaximumRotationalVelocity = 0;
+
+        ttl = 0;
+        fadeOut = false;
+        fadeOutInterpolator = null;
+
+        currentX = currentY = 0f;
+        currentRotation = 0f;
+        alpha = 0f;
+        startedAnimation = false;
+        terminated = false;
+    }
+
     protected void configurePaint(Paint paint) {
         // Hook for subclasses to configure the default paint attributes.
     }
@@ -117,7 +142,7 @@ public abstract class Confetto {
      * @param canvas the canvas to draw on.
      * @param matrix an identity matrix to use for draw manipulations.
      * @param paint the paint to perform canvas draw operations on. This paint has already been
-     *              configured via {@link #configurePaint(Paint)}.
+     *   configured via {@link #configurePaint(Paint)}.
      * @param x the x position of the confetto relative to the canvas.
      * @param y the y position of the confetto relative to the canvas.
      * @param rotation the rotation (in degrees) to draw the confetto.
@@ -134,17 +159,7 @@ public abstract class Confetto {
 
         public Configurator setConfetto(Confetto confetto) {
             this.confetto = confetto;
-
-            // Reset everything to default value
-            confetto.initialDelay = 0f;
-            confetto.initialX = confetto.initialY = 0f;
-            confetto.initialVelocityX = confetto.initialVelocityY = 0f;
-            confetto.accelerationX = confetto.accelerationY = 0f;
-            confetto.maximumVelocityX = confetto.maximumVelocityY = 0f;
-            confetto.initialRotation = 0f;
-            confetto.initialRotationalVelocity = confetto.rotationalAcceleration = 0f;
-            confetto.maximumRotationalVelocity = 0f;
-
+            this.confetto.reset();
             return this;
         }
 
