@@ -4,5 +4,6 @@
     <string name="generate_confetti_stream">Stream</string>
     <string name="generate_confetti_infinite">Infinite</string>
 
-    <string name="showering_confetti">Showering confetti</string>
+    <string name="falling_confetti_from_top">Falling confetti from top</string>
+    <string name="falling_confetti_from_point">Falling confetti from point</string>
 </resources>

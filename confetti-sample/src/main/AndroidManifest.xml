@@ -13,7 +13,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ShoweringConfettiActivity" />
+        <activity android:name=".FallingConfettiFromTopActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity android:name=".FallingConfettiFromPointActivity"
+            android:parentActivityName=".MainActivity" />
 
     </application>
 

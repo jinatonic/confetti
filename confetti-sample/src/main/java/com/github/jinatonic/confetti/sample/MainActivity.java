@@ -15,7 +15,14 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
 
     private static final ConfettiSample[] SAMPLES = {
-            new ConfettiSample(R.string.showering_confetti, ShoweringConfettiActivity.class),
+            new ConfettiSample(
+                    R.string.falling_confetti_from_top,
+                    FallingConfettiFromTopActivity.class
+            ),
+            new ConfettiSample(
+                    R.string.falling_confetti_from_point,
+                    FallingConfettiFromPointActivity.class
+            ),
     };
 
     @Override

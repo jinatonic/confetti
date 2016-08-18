@@ -18,13 +18,13 @@ public abstract class Confetto {
     private float initialDelay;
     private float initialX, initialY, initialVelocityX, initialVelocityY,
             accelerationX, accelerationY;
-    private float maximumVelocityX, maximumVelocityY;
-    private long millisToReachMaximumVelocityX, millisToReachMaximumVelocityY;
+    private Float targetVelocityX, targetVelocityY;
+    private Long millisToReachTargetVelocityX, millisToReachTargetVelocityY;
 
     // Configured rotation states
     private float initialRotation, initialRotationalVelocity, rotationalAcceleration;
-    private float maximumRotationalVelocity;
-    private long millisToReachMaximumRotationalVelocity;
+    private Float targetRotationalVelocity;
+    private Long millisToReachTargetRotationalVelocity;
 
     // Configured animation states
     private long ttl;
@@ -43,12 +43,19 @@ public abstract class Confetto {
      * and before the confetto gets animated.
      */
     protected void prepare() {
-        millisToReachMaximumVelocityX = (long)
-                ((maximumVelocityX - initialVelocityX) / accelerationX);
-        millisToReachMaximumVelocityY = (long)
-                ((maximumVelocityY - initialVelocityY) / accelerationY);
-        millisToReachMaximumRotationalVelocity = (long)
-                ((maximumRotationalVelocity - initialRotationalVelocity) / rotationalAcceleration);
+        if (targetVelocityX != null) {
+            millisToReachTargetVelocityX = (long)
+                    ((targetVelocityX - initialVelocityX) / accelerationX);
+        }
+        if (targetVelocityY != null) {
+            millisToReachTargetVelocityY = (long)
+                    ((targetVelocityY - initialVelocityY) / accelerationY);
+        }
+        if (targetRotationalVelocity != null) {
+            millisToReachTargetRotationalVelocity = (long)
+                    ((targetRotationalVelocity - initialRotationalVelocity)
+                            / rotationalAcceleration);
+        }
 
         configurePaint(workPaint);
     }
@@ -58,14 +65,14 @@ public abstract class Confetto {
         initialX = initialY = 0f;
         initialVelocityX = initialVelocityY = 0f;
         accelerationX = accelerationY = 0f;
-        maximumVelocityX = maximumVelocityY = 0f;
-        millisToReachMaximumVelocityX = millisToReachMaximumVelocityY = 0;
+        targetVelocityX = targetVelocityY = null;
+        millisToReachTargetVelocityX = millisToReachTargetVelocityY = null;
 
         initialRotation = 0f;
         initialRotationalVelocity = 0f;
         rotationalAcceleration = 0f;
-        maximumRotationalVelocity = 0f;
-        millisToReachMaximumRotationalVelocity = 0;
+        targetRotationalVelocity = null;
+        millisToReachTargetRotationalVelocity = null;
 
         ttl = 0;
         fadeOut = false;
@@ -96,12 +103,12 @@ public abstract class Confetto {
         terminated |= startedAnimation && ttl > passedTime;
         if (startedAnimation && !terminated) {
             currentX = computeDistance(passedTime, initialX, initialVelocityX, accelerationX,
-                    millisToReachMaximumVelocityX, maximumVelocityX);
+                    millisToReachTargetVelocityX, targetVelocityX);
             currentY = computeDistance(passedTime, initialY, initialVelocityY, accelerationY,
-                    millisToReachMaximumVelocityY, maximumVelocityY);
+                    millisToReachTargetVelocityY, targetVelocityY);
             currentRotation = computeDistance(passedTime, initialRotation,
                     initialRotationalVelocity, rotationalAcceleration,
-                    millisToReachMaximumRotationalVelocity, maximumRotationalVelocity);
+                    millisToReachTargetRotationalVelocity, targetRotationalVelocity);
 
             // TODO fix this
             terminated = currentX >= bound.width() || currentY >= bound.height();
@@ -110,16 +117,18 @@ public abstract class Confetto {
         return terminated;
     }
 
-    private float computeDistance(long t, float xi, float vi, float ai, long maxTime,
-            float vMax) {
-        if (t < maxTime) {
+    private float computeDistance(long t, float xi, float vi, float ai, Long targetTime,
+            Float vTarget) {
+        if (targetTime == null || t < targetTime) {
             // distance covered with linear acceleration
             // distance = xi + vi * t + 1/2 * a * t^2
             return xi + vi * t + 0.5f * ai * t * t;
         } else {
             // distance covered with linear acceleration + distance covered with max velocity
-            // distance = xi + vi * maxTime + 1/2 * a * maxTime^2 + (t - maxTime) * vMax;
-            return xi + vi * maxTime + 0.5f * ai * maxTime * maxTime + (t - maxTime) * vMax;
+            // distance = xi + vi * targetTime + 1/2 * a * targetTime^2
+            //     + (t - targetTime) * vTarget;
+            return xi + vi * targetTime + 0.5f * ai * targetTime * targetTime
+                    + (t - targetTime) * vTarget;
         }
     }
 
@@ -198,13 +207,13 @@ public abstract class Confetto {
             return this;
         }
 
-        public Configurator setMaximumVelocityX(float val) {
-            confetto.maximumVelocityX = val;
+        public Configurator setTargetVelocityX(Float val) {
+            confetto.targetVelocityX = val;
             return this;
         }
 
-        public Configurator setMaximumVelocityY(float val) {
-            confetto.maximumVelocityY = val;
+        public Configurator setTargetVelocityY(Float val) {
+            confetto.targetVelocityY = val;
             return this;
         }
 
@@ -223,8 +232,8 @@ public abstract class Confetto {
             return this;
         }
 
-        public Configurator setMaximumRotationalVelocity(float val) {
-            confetto.maximumRotationalVelocity = val;
+        public Configurator setTargetRotationalVelocity(Float val) {
+            confetto.targetRotationalVelocity = val;
             return this;
         }
 

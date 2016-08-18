@@ -20,8 +20,7 @@ public abstract class AbstractActivity extends AppCompatActivity implements
     protected ViewGroup container;
 
     protected int confettiSize;
-    protected float velocitySlow, velocityNormal, velocityFast;
-    protected float defaultMaximumVelocityY;
+    protected float velocitySuperSlow, velocitySlow, velocityNormal, velocityFast;
     private int[] colors;
     private List<Bitmap> bitmaps;
 
@@ -37,10 +36,10 @@ public abstract class AbstractActivity extends AppCompatActivity implements
 
         final Resources res = getResources();
         confettiSize = res.getDimensionPixelSize(R.dimen.default_confetti_size);
+        velocitySuperSlow = res.getDimensionPixelOffset(R.dimen.default_velocity_super_slow);
         velocitySlow = res.getDimensionPixelSize(R.dimen.default_velocity_slow);
         velocityNormal = res.getDimensionPixelSize(R.dimen.default_velocity_normal);
         velocityFast = res.getDimensionPixelSize(R.dimen.default_velocity_fast);
-        defaultMaximumVelocityY = res.getDimensionPixelOffset(R.dimen.default_maximum_velocity_y);
 
         colors = new int[] {
                 res.getColor(R.color.gold_dark),

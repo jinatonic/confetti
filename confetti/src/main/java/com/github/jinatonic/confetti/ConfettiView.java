@@ -53,6 +53,13 @@ public class ConfettiView extends View implements View.OnLayoutChangeListener {
         }
     }
 
+    /**
+     * Reset the internal state of this view to allow for a new confetti animation.
+     */
+    public void reset() {
+        this.terminated = false;
+    }
+
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();

@@ -2,7 +2,6 @@ package com.github.jinatonic.confetti;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Interpolator;
 import android.graphics.Rect;
 import android.view.ViewGroup;
@@ -22,8 +21,6 @@ import java.util.Random;
  */
 public class ConfettiManager {
     public static final long INFINITE_DURATION = Long.MAX_VALUE;
-
-    private static Float defaultAccelerationX, defaultAccelerationY;
 
     private final Confetto.Configurator configurator = new Confetto.Configurator();
     private final Random random = new Random();
@@ -54,11 +51,12 @@ public class ConfettiManager {
     private float velocityY, velocityDeviationY;
     private float accelerationX, accelerationDeviationX;
     private float accelerationY, accelerationDeviationY;
-    private float maximumVelocityX, maximumVelocityY;
+    private Float targetVelocityX, targetVelocityXDeviation;
+    private Float targetVelocityY, targetVelocityYDeviation;
     private int initialRotation, initialRotationDeviation;
     private float rotationalVelocity, rotationalVelocityDeviation;
     private float rotationalAcceleration, rotationalAccelerationDeviation;
-    private float maximumRotationalVelocity;
+    private Float targetRotationalVelocity, targetRotationalVelocityDeviation;
     private long ttl;
 
     public interface ConfettoGenerator {
@@ -85,19 +83,7 @@ public class ConfettiManager {
         this.confettiView = confettiView;
         this.confettiView.bind(confetti);
 
-        if (defaultAccelerationX == null) {
-            final Resources res = context.getResources();
-            defaultAccelerationX = res.getDimension(
-                    R.dimen.default_acceleration_x_dp_per_second) / 1000f;
-            defaultAccelerationY = res.getDimension(
-                    R.dimen.default_acceleration_y_dp_per_second) / 1000f;
-        }
-
         // Set the defaults
-        this.accelerationX = defaultAccelerationX;
-        this.accelerationY = defaultAccelerationY;
-        this.maximumVelocityX = this.maximumVelocityY = this.maximumRotationalVelocity =
-                Float.MAX_VALUE;
         this.ttl = -1;
         this.bound = new Rect(0, 0, parentView.getWidth(), parentView.getHeight());
     }
@@ -199,8 +185,8 @@ public class ConfettiManager {
      * @return the confetti manager so that the set calls can be chained.
      */
     public ConfettiManager setAccelerationX(float accelerationX, float accelerationDeviationX) {
-        this.accelerationX = accelerationX / 1000f;
-        this.accelerationDeviationX = accelerationDeviationX / 1000f;
+        this.accelerationX = accelerationX / 1000000f;
+        this.accelerationDeviationX = accelerationDeviationX / 1000000f;
         return this;
     }
 
@@ -221,30 +207,52 @@ public class ConfettiManager {
      * @return the confetti manager so that the set calls can be chained.
      */
     public ConfettiManager setAccelerationY(float accelerationY, float accelerationDeviationY) {
-        this.accelerationY = accelerationY / 1000f;
-        this.accelerationDeviationY = accelerationDeviationY / 1000f;
+        this.accelerationY = accelerationY / 1000000f;
+        this.accelerationDeviationY = accelerationDeviationY / 1000000f;
         return this;
     }
 
     /**
-     * Set the maximum X velocity that confetti can reach during the animation.
+     * @see {@link #setTargetVelocityX(float, float)} but with no deviation.
+     */
+    public ConfettiManager setTargetVelocityX(float targetVelocityX) {
+        return setTargetVelocityX(targetVelocityX, 0f);
+    }
+
+    /**
+     * Set the target X velocity that confetti can reach during the animation. The actual confetti's
+     * target X velocity will be (targetVelocityX +- [0, targetVelocityXDeviation]).
      *
-     * @param maximumVelocityX the maximum X velocity in pixels per second.
+     * @param targetVelocityX the target X velocity in pixels per second.
+     * @param targetVelocityXDeviation  the deviation from target X velocity in pixels per second.
      * @return the confetti manager so that the set calls can be chained.
      */
-    public ConfettiManager setMaximumVelocityX(float maximumVelocityX) {
-        this.maximumVelocityX = maximumVelocityX / 1000f;
+    public ConfettiManager setTargetVelocityX(float targetVelocityX,
+            float targetVelocityXDeviation) {
+        this.targetVelocityX = targetVelocityX / 1000f;
+        this.targetVelocityXDeviation = targetVelocityXDeviation / 1000f;
         return this;
     }
 
     /**
-     * Set the maximum Y velocity that confetti can reach during the animation.
+     * @see {@link #setTargetVelocityY(float, float)} but with no deviation.
+     */
+    public ConfettiManager setTargetVelocityY(float targetVelocityY) {
+        return setTargetVelocityY(targetVelocityY, 0f);
+    }
+
+    /**
+     * Set the target Y velocity that confetti can reach during the animation. The actual confetti's
+     * target Y velocity will be (targetVelocityY +- [0, targetVelocityYDeviation]).
      *
-     * @param maximumVelocityY the maximum Y velocity in pixels per second.
+     * @param targetVelocityY the target Y velocity in pixels per second.
+     * @param targetVelocityYDeviation  the deviation from target Y velocity in pixels per second.
      * @return the confetti manager so that the set calls can be chained.
      */
-    public ConfettiManager setMaximumVelocityY(float maximumVelocityY) {
-        this.maximumVelocityY = maximumVelocityY / 1000f;
+    public ConfettiManager setTargetVelocityY(float targetVelocityY,
+            float targetVelocityYDeviation) {
+        this.targetVelocityY = targetVelocityY / 1000f;
+        this.targetVelocityYDeviation = targetVelocityYDeviation / 1000f;
         return this;
     }
 
@@ -313,19 +321,32 @@ public class ConfettiManager {
      */
     public ConfettiManager setRotationalAcceleration(float rotationalAcceleration,
             float rotationalAccelerationDeviation) {
-        this.rotationalAcceleration = rotationalAcceleration / 1000f;
-        this.rotationalAccelerationDeviation = rotationalAccelerationDeviation / 1000f;
+        this.rotationalAcceleration = rotationalAcceleration / 1000000f;
+        this.rotationalAccelerationDeviation = rotationalAccelerationDeviation / 1000000f;
         return this;
     }
 
     /**
-     * Set the maximum rotational velocity that confetti can reach during the animation.
+     * @see {@link #setTargetRotationalVelocity(float, float)} but with no deviation.
+     */
+    public ConfettiManager setTargetRotationalVelocity(float targetRotationalVelocity) {
+        return setTargetRotationalVelocity(targetRotationalVelocity, 0f);
+    }
+
+    /**
+     * Set the target rotational velocity that confetti can reach during the animation. The actual
+     * confetti's target rotational velocity will be
+     * (targetRotationalVelocity +- [0, targetRotationalVelocityDeviation]).
      *
-     * @param maximumRotationalVelocity the maximum rotational velocity in degrees per second.
+     * @param targetRotationalVelocity the target rotational velocity in degrees per second.
+     * @param targetRotationalVelocityDeviation the deviation from target rotational velocity
+     *   in degrees per second.
      * @return the confetti manager so that the set calls can be chained.
      */
-    public ConfettiManager setMaximumRotationalVelocity(float maximumRotationalVelocity) {
-        this.maximumRotationalVelocity = maximumRotationalVelocity / 1000f;
+    public ConfettiManager setTargetRotationalVelocity(float targetRotationalVelocity,
+            float targetRotationalVelocityDeviation) {
+        this.targetRotationalVelocity = targetRotationalVelocity / 1000f;
+        this.targetRotationalVelocityDeviation = targetRotationalVelocityDeviation / 1000f;
         return this;
     }
 
@@ -387,17 +408,61 @@ public class ConfettiManager {
      * Start the confetti animation configured by this manager.
      */
     public void animate() {
+        cleanupExistingAnimation();
+        attachConfettiViewToParent();
+        addNewConfetti(numInitialCount, 0);
+        startNewAnimation();
+    }
+
+    /**
+     * Terminate the currently running animation if there is any.
+     */
+    public void terminate() {
         if (animator != null) {
             animator.cancel();
         }
+        confettiView.terminate();
+    }
+
+    private void cleanupExistingAnimation() {
+        if (animator != null) {
+            animator.cancel();
+        }
+
         lastEmittedTimestamp = 0;
+        final Iterator<Confetto> iterator = confetti.iterator();
+        while (iterator.hasNext()) {
+            recycledConfetti.add(iterator.next());
+            iterator.remove();
+        }
+    }
 
-        attachConfettiViewToParent();
+    private void attachConfettiViewToParent() {
+        final ViewParent currentParent = confettiView.getParent();
+        if (currentParent != null) {
+            if (currentParent != parentView) {
+                ((ViewGroup) currentParent).removeView(confettiView);
+                parentView.addView(confettiView);
+            }
+        } else {
+            parentView.addView(confettiView);
+        }
 
-        // TODO: what happens if we don't clear out previous confetti? o.O
-        confetti.clear();
-        addNewConfetti(numInitialCount, 0);
+        confettiView.reset();
+    }
 
+    private void addNewConfetti(int numConfetti, long initialDelay) {
+        for (int i = 0; i < numConfetti; i++) {
+            Confetto confetto = recycledConfetti.poll();
+            if (confetto == null) {
+                confetto = confettoGenerator.generateConfetto(random);
+            }
+            configureConfetto(configurator, confetto, confettiSource, random, initialDelay);
+            this.confetti.add(confetto);
+        }
+    }
+
+    private void startNewAnimation() {
         // Never-ending animator, we will cancel once the termination condition is reached.
         animator = ValueAnimator.ofInt(0)
                 .setDuration(Long.MAX_VALUE);
@@ -413,44 +478,10 @@ public class ConfettiManager {
                 } else {
                     confettiView.invalidate();
                 }
-
             }
         });
 
         animator.start();
-    }
-
-    /**
-     * Terminate the currently running animation if there is any.
-     */
-    public void terminate() {
-        if (animator != null) {
-            animator.cancel();
-        }
-        confettiView.terminate();
-    }
-
-    private void attachConfettiViewToParent() {
-        final ViewParent currentParent = confettiView.getParent();
-        if (currentParent != null) {
-            if (currentParent != parentView) {
-                ((ViewGroup) currentParent).removeView(confettiView);
-                parentView.addView(confettiView);
-            }
-        } else {
-            parentView.addView(confettiView);
-        }
-    }
-
-    private void addNewConfetti(int numConfetti, long initialDelay) {
-        for (int i = 0; i < numConfetti; i++) {
-            Confetto confetto = recycledConfetti.poll();
-            if (confetto == null) {
-                confetto = confettoGenerator.generateConfetto(random);
-            }
-            configureConfetto(configurator, confetto, confettiSource, random, initialDelay);
-            this.confetti.add(confetto);
-        }
     }
 
     private void processNewEmission(long elapsedTime) {
@@ -493,15 +524,19 @@ public class ConfettiManager {
                 .setInitialVelocityY(getVarianceAmount(velocityY, velocityDeviationY, random))
                 .setAccelerationX(getVarianceAmount(accelerationX, accelerationDeviationX, random))
                 .setAccelerationY(getVarianceAmount(accelerationY, accelerationDeviationY, random))
-                .setMaximumVelocityX(maximumVelocityX)
-                .setMaximumVelocityY(maximumVelocityY)
-                .setInitialRotation(getVarianceAmount(initialRotation, initialRotationDeviation,
-                        random))
+                .setTargetVelocityX(targetVelocityX == null ? null :
+                        getVarianceAmount(targetVelocityX, targetVelocityXDeviation, random))
+                .setTargetVelocityY(targetVelocityY == null ? null :
+                        getVarianceAmount(targetVelocityY, targetVelocityYDeviation, random))
+                .setInitialRotation(
+                        getVarianceAmount(initialRotation, initialRotationDeviation, random))
                 .setInitialRotationalVelocity(getVarianceAmount(rotationalVelocity,
                         rotationalVelocityDeviation, random))
                 .setRotationalAcceleration(getVarianceAmount(rotationalAcceleration,
                         rotationalAccelerationDeviation, random))
-                .setMaximumRotationalVelocity(maximumRotationalVelocity)
+                .setTargetRotationalVelocity(targetRotationalVelocity == null ? null :
+                        getVarianceAmount(targetRotationalVelocity,
+                                targetRotationalVelocityDeviation, random))
                 .setTTL(ttl)
                 .setFadeOut(fadeOut, fadeOutInterpolator)
                 .configure();

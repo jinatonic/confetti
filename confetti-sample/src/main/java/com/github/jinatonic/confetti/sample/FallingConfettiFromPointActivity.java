@@ -2,22 +2,21 @@ package com.github.jinatonic.confetti.sample;
 
 import com.github.jinatonic.confetti.ConfettiManager;
 
-public class ShoweringConfettiActivity extends AbstractActivity {
+public class FallingConfettiFromPointActivity extends AbstractActivity {
     private ConfettiManager confettiManager;
 
     private void ensureConfettiManager() {
         if (confettiManager == null) {
-            final int width = container.getWidth();
             final ConfettiManager.ConfettiSource confettiSource =
-                    new ConfettiManager.ConfettiSource(0, -confettiSize, width, -confettiSize);
+                    new ConfettiManager.ConfettiSource(-confettiSize, -confettiSize);
             confettiManager = new ConfettiManager(this, this, confettiSource, container)
-                    .setVelocityX(0, velocitySlow)
-                    .setVelocityY(velocityNormal)
-                    .setAccelerationY(0f)
-                    .setMaximumVelocityY(defaultMaximumVelocityY)
+                    .setVelocityX(velocityFast, velocityNormal)
+                    .setAccelerationX(-velocityNormal, velocitySlow)
+                    .setTargetVelocityX(0, velocitySuperSlow)
+                    .setVelocityY(velocityNormal, velocitySlow)
                     .setInitialRotation(180, 180)
                     .setRotationalAcceleration(360, 180)
-                    .setMaximumRotationalVelocity(360);
+                    .setTargetRotationalVelocity(360);
         }
     }
 
