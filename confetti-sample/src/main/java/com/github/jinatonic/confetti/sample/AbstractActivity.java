@@ -62,9 +62,26 @@ public abstract class AbstractActivity extends AppCompatActivity implements
         }
     }
 
-    protected abstract void generateOnce();
-    protected abstract void generateStream();
-    protected abstract void generateInfinite();
+    protected void generateOnce() {
+        getConfettiManager().setNumInitialCount(100)
+                .setEmissionDuration(0)
+                .animate();
+    }
+
+    protected void generateStream() {
+        getConfettiManager().setNumInitialCount(0)
+                .setEmissionDuration(3000)
+                .setEmissionRate(100)
+                .animate();
+    }
+    protected void generateInfinite() {
+        getConfettiManager().setNumInitialCount(0)
+                .setEmissionDuration(ConfettiManager.INFINITE_DURATION)
+                .setEmissionRate(50)
+                .animate();
+    }
+
+    protected abstract ConfettiManager getConfettiManager();
 
     @Override
     public Confetto generateConfetto(Random random) {

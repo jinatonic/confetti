@@ -17,6 +17,8 @@
             android:parentActivityName=".MainActivity" />
         <activity android:name=".FallingConfettiFromPointActivity"
             android:parentActivityName=".MainActivity" />
+        <activity android:name=".ExplosionActivity"
+            android:parentActivityName=".MainActivity" />
 
     </application>
 

@@ -1,21 +1,25 @@
 package com.github.jinatonic.confetti.confetto;
 
 import android.graphics.Canvas;
-import android.graphics.Interpolator;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.view.animation.Interpolator;
 
 /**
  * Abstract class that represents a single confetto on the screen. This class holds all of the
  * internal states for the confetto to help it animate.
+ *
+ * <p>All of the configured states are in milliseconds, e.g. pixels per millisecond for velocity.
  */
 public abstract class Confetto {
+    private static final int MAX_ALPHA = 255;
+
     private final Matrix matrix = new Matrix();
     private final Paint workPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     // Configured coordinate states
-    private float initialDelay;
+    private long initialDelay;
     private float initialX, initialY, initialVelocityX, initialVelocityY,
             accelerationX, accelerationY;
     private Float targetVelocityX, targetVelocityY;
@@ -28,40 +32,118 @@ public abstract class Confetto {
 
     // Configured animation states
     private long ttl;
-    // TODO: incorporate fadeout
-    private boolean fadeOut;
     private Interpolator fadeOutInterpolator;
+
+    private float millisToReachBound;
 
     // Current draw states
     private float currentX, currentY;
     private float currentRotation;
-    private float alpha;
+    // alpha is [0, 255]
+    private int alpha;
     private boolean startedAnimation, terminated;
 
     /**
      * This method should be called after all of the confetto's state variables are configured
      * and before the confetto gets animated.
+     *
+     * @param bound the space in which the confetto can display in.
      */
-    protected void prepare() {
-        if (targetVelocityX != null) {
-            millisToReachTargetVelocityX = (long)
-                    ((targetVelocityX - initialVelocityX) / accelerationX);
-        }
-        if (targetVelocityY != null) {
-            millisToReachTargetVelocityY = (long)
-                    ((targetVelocityY - initialVelocityY) / accelerationY);
-        }
-        if (targetRotationalVelocity != null) {
-            millisToReachTargetRotationalVelocity = (long)
-                    ((targetRotationalVelocity - initialRotationalVelocity)
-                            / rotationalAcceleration);
-        }
+    public void prepare(Rect bound) {
+        millisToReachTargetVelocityX = computeMillisToReachTarget(targetVelocityX,
+                initialVelocityX, accelerationX);
+        millisToReachTargetVelocityY = computeMillisToReachTarget(targetVelocityY,
+                initialVelocityY, accelerationY);
+        millisToReachTargetRotationalVelocity = computeMillisToReachTarget(targetRotationalVelocity,
+                initialRotationalVelocity, rotationalAcceleration);
+
+        // Compute how long it would take to reach x/y bounds or reach TTL.
+        millisToReachBound = ttl >= 0 ? ttl : Long.MAX_VALUE;
+        final long timeToReachXBound = computeBound(initialX, initialVelocityX, accelerationX,
+                millisToReachTargetVelocityX, targetVelocityX, bound.left, bound.right);
+        millisToReachBound = Math.min(timeToReachXBound, millisToReachBound);
+        final long timeToReachYBound = computeBound(initialY, initialVelocityY, accelerationY,
+                millisToReachTargetVelocityY, targetVelocityY, bound.top, bound.bottom);
+        millisToReachBound = Math.min(timeToReachYBound, millisToReachBound);
 
         configurePaint(workPaint);
     }
 
-    protected void reset() {
-        initialDelay = 0f;
+    // Visible for testing
+    protected static Long computeMillisToReachTarget(Float targetVelocity, float initialVelocity,
+            float acceleration) {
+        if (targetVelocity != null) {
+            if (acceleration != 0f) {
+                final long time = (long) ((targetVelocity - initialVelocity) / acceleration);
+                return time > 0 ? time : 0;
+            } else {
+                if (targetVelocity < initialVelocity) {
+                    return 0L;
+                } else {
+                    return null;
+                }
+            }
+        } else {
+            return null;
+        }
+    }
+
+    // Visible for testing
+    protected static long computeBound(float initialPos, float velocity, float acceleration,
+            Long targetTime, Float targetVelocity, int minBound, int maxBound) {
+        if (acceleration != 0) {
+            // non-zero acceleration
+            final int bound = acceleration > 0 ? maxBound : minBound;
+
+            if (targetTime == null || targetTime < 0) {
+                // https://www.wolframalpha.com/input/
+                // ?i=solve+for+t+in+(d+%3D+x+%2B+v+*+t+%2B+0.5+*+a+*+t+*+t)
+
+                final double tmp = Math.sqrt(
+                        2 * acceleration * bound - 2 * acceleration * initialPos
+                                + velocity * velocity);
+
+                final double firstTime = (-tmp - velocity) / acceleration;
+                if (firstTime > 0) {
+                    return (long) firstTime;
+                }
+
+                final double secondTime = (tmp - velocity) / acceleration;
+                if (secondTime > 0) {
+                    return (long) secondTime;
+                }
+
+                return Long.MAX_VALUE;
+            } else {
+                // d = x + v * tm + 0.5 * a * tm * tm + tv * (t - tm)
+                // d - x - v * tm - 0.5 * a * tm * tm = tv * t - tv * tm
+                // d - x - v * tm - 0.5 * a * tm * tm + tv * tm = tv * t
+
+                final double time =
+                        (bound - initialPos - velocity * targetTime -
+                                0.5 * acceleration * targetTime * targetTime +
+                                targetVelocity * targetTime) /
+                        targetVelocity;
+
+                return time > 0 ? (long) time : Long.MAX_VALUE;
+            }
+        } else {
+            float actualVelocity = targetTime == null ? velocity : targetVelocity;
+            final int bound = actualVelocity > 0 ? maxBound : minBound;
+            if (actualVelocity != 0) {
+                final double time = (bound - initialPos) / actualVelocity;
+                return time > 0 ? (long) time : Long.MAX_VALUE;
+            } else {
+                return Long.MAX_VALUE;
+            }
+        }
+    }
+
+    /**
+     * Reset this confetto object's internal states so that it can be re-used.
+     */
+    public void reset() {
+        initialDelay = 0;
         initialX = initialY = 0f;
         initialVelocityX = initialVelocityY = 0f;
         accelerationX = accelerationY = 0f;
@@ -75,43 +157,54 @@ public abstract class Confetto {
         millisToReachTargetRotationalVelocity = null;
 
         ttl = 0;
-        fadeOut = false;
         fadeOutInterpolator = null;
+
+        millisToReachBound = 0f;
 
         currentX = currentY = 0f;
         currentRotation = 0f;
-        alpha = 0f;
+        alpha = MAX_ALPHA;
         startedAnimation = false;
         terminated = false;
     }
 
+    /**
+     * Hook to configure the global paint states before any animation happens.
+     *
+     * @param paint the paint object that will be used to perform all draw operations.
+     */
     protected void configurePaint(Paint paint) {
-        // Hook for subclasses to configure the default paint attributes.
+        paint.setAlpha(alpha);
     }
 
     /**
      * Update the confetto internal state based on the provided passed time.
      *
      * @param passedTime time since the beginning of the animation.
-     * @param bound the space in which the confetto can display in.
      * @return whether this particular confetto has terminated.
      */
-    public boolean applyUpdate(long passedTime, Rect bound) {
-        passedTime -= initialDelay;
-        startedAnimation = passedTime >= 0;
+    public boolean applyUpdate(long passedTime) {
+        final long animatedTime = passedTime - initialDelay;
+        startedAnimation = animatedTime >= 0;
 
-        terminated |= startedAnimation && ttl > passedTime;
         if (startedAnimation && !terminated) {
-            currentX = computeDistance(passedTime, initialX, initialVelocityX, accelerationX,
+            currentX = computeDistance(animatedTime, initialX, initialVelocityX, accelerationX,
                     millisToReachTargetVelocityX, targetVelocityX);
-            currentY = computeDistance(passedTime, initialY, initialVelocityY, accelerationY,
+            currentY = computeDistance(animatedTime, initialY, initialVelocityY, accelerationY,
                     millisToReachTargetVelocityY, targetVelocityY);
-            currentRotation = computeDistance(passedTime, initialRotation,
+            currentRotation = computeDistance(animatedTime, initialRotation,
                     initialRotationalVelocity, rotationalAcceleration,
                     millisToReachTargetRotationalVelocity, targetRotationalVelocity);
 
-            // TODO fix this
-            terminated = currentX >= bound.width() || currentY >= bound.height();
+            if (fadeOutInterpolator != null) {
+                final float interpolatedTime =
+                        fadeOutInterpolator.getInterpolation(animatedTime / millisToReachBound);
+                alpha = (int) (interpolatedTime * MAX_ALPHA);
+            } else {
+                alpha = MAX_ALPHA;
+            }
+
+            terminated = animatedTime >= millisToReachBound;
         }
 
         return terminated;
@@ -140,6 +233,7 @@ public abstract class Confetto {
     public void draw(Canvas canvas) {
         if (startedAnimation && !terminated) {
             matrix.reset();
+            workPaint.setAlpha(alpha);
             drawInternal(canvas, matrix, workPaint, currentX, currentY, currentRotation);
         }
     }
@@ -159,98 +253,68 @@ public abstract class Confetto {
     protected abstract void drawInternal(Canvas canvas, Matrix matrix, Paint paint, float x,
             float y, float rotation);
 
+
     /**
-     * Helper builder class to construct all of the necessary values used in {@link #prepare()}.
-     * The primary purpose of this is to better visualize the values you are setting.
+     * Helper methods to set all of the necessary values for the confetto.
      */
-    public static class Configurator {
-        private Confetto confetto;
 
-        public Configurator setConfetto(Confetto confetto) {
-            this.confetto = confetto;
-            this.confetto.reset();
-            return this;
-        }
+    public void setInitialDelay(long val) {
+        this.initialDelay = val;
+    }
 
-        public Configurator setInitialDelay(float val) {
-            confetto.initialDelay = val;
-            return this;
-        }
+    public void setInitialX(float val) {
+        this.initialX = val;
+    }
 
-        public Configurator setInitialX(float val) {
-            confetto.initialX = val;
-            return this;
-        }
+    public void setInitialY(float val) {
+        this.initialY = val;
+    }
 
-        public Configurator setInitialY(float val) {
-            confetto.initialY = val;
-            return this;
-        }
+    public void setInitialVelocityX(float val) {
+        this.initialVelocityX = val;
+    }
 
-        public Configurator setInitialVelocityX(float val) {
-            confetto.initialVelocityX = val;
-            return this;
-        }
+    public void setInitialVelocityY(float val) {
+        this.initialVelocityY = val;
+    }
 
-        public Configurator setInitialVelocityY(float val) {
-            confetto.initialVelocityY = val;
-            return this;
-        }
+    public void setAccelerationX(float val) {
+        this.accelerationX = val;
+    }
 
-        public Configurator setAccelerationX(float val) {
-            confetto.accelerationX = val;
-            return this;
-        }
+    public void setAccelerationY(float val) {
+        this.accelerationY = val;
+    }
 
-        public Configurator setAccelerationY(float val) {
-            confetto.accelerationY = val;
-            return this;
-        }
+    public void setTargetVelocityX(Float val) {
+        this.targetVelocityX = val;
+    }
 
-        public Configurator setTargetVelocityX(Float val) {
-            confetto.targetVelocityX = val;
-            return this;
-        }
+    public void setTargetVelocityY(Float val) {
+        this.targetVelocityY = val;
+    }
 
-        public Configurator setTargetVelocityY(Float val) {
-            confetto.targetVelocityY = val;
-            return this;
-        }
+    public void setInitialRotation(float val) {
+        this.initialRotation = val;
+    }
 
-        public Configurator setInitialRotation(float val) {
-            confetto.initialRotation = val;
-            return this;
-        }
+    public void setInitialRotationalVelocity(float val) {
+        this.initialRotationalVelocity = val;
+    }
 
-        public Configurator setInitialRotationalVelocity(float val) {
-            confetto.initialRotationalVelocity = val;
-            return this;
-        }
+    public void setRotationalAcceleration(float val) {
+        this.rotationalAcceleration = val;
+    }
 
-        public Configurator setRotationalAcceleration(float val) {
-            confetto.rotationalAcceleration = val;
-            return this;
-        }
+    public void setTargetRotationalVelocity(Float val) {
+        this.targetRotationalVelocity = val;
+    }
 
-        public Configurator setTargetRotationalVelocity(Float val) {
-            confetto.targetRotationalVelocity = val;
-            return this;
-        }
+    public void setTTL(long val) {
+        this.ttl = val;
+    }
 
-        public Configurator setTTL(long val) {
-            confetto.ttl = val;
-            return this;
-        }
-
-        public Configurator setFadeOut(boolean fadeOut, Interpolator fadeOutInterpolator) {
-            confetto.fadeOut = fadeOut;
-            confetto.fadeOutInterpolator = fadeOutInterpolator;
-            return this;
-        }
-
-        public Confetto configure() {
-            confetto.prepare();
-            return confetto;
-        }
+    public void setFadeOut(Interpolator fadeOutInterpolator) {
+        this.fadeOutInterpolator = fadeOutInterpolator;
     }
 }

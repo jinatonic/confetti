@@ -23,6 +23,10 @@ public class MainActivity extends AppCompatActivity {
                     R.string.falling_confetti_from_point,
                     FallingConfettiFromPointActivity.class
             ),
+            new ConfettiSample(
+                    R.string.explosion_confetti,
+                    ExplosionActivity.class
+            ),
     };
 
     @Override

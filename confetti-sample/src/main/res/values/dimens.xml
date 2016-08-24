@@ -6,4 +6,6 @@
     <dimen name="default_velocity_slow">50dp</dimen>
     <dimen name="default_velocity_normal">100dp</dimen>
     <dimen name="default_velocity_fast">200dp</dimen>
+
+    <dimen name="explosion_radius">100dp</dimen>
 </resources>

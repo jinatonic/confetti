@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.view.animation.Interpolator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,19 @@ public class Utils {
     private static final Paint PAINT = new Paint();
     static {
         PAINT.setStyle(Paint.Style.FILL);
+    }
+
+    private static Interpolator defaultAlphaInterpolator;
+    public static Interpolator getDefaultAlphaInterpolator() {
+        if (defaultAlphaInterpolator == null) {
+            defaultAlphaInterpolator = new Interpolator() {
+                @Override
+                public float getInterpolation(float v) {
+                    return v >= 0.9f ? 1f - (v - 0.9f) * 10f : 1f;
+                }
+            };
+        }
+        return defaultAlphaInterpolator;
     }
 
     public static List<Bitmap> generateConfettiBitmaps(int[] colors, int size) {

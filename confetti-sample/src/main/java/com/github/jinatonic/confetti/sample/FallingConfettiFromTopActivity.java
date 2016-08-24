@@ -5,7 +5,8 @@ import com.github.jinatonic.confetti.ConfettiManager;
 public class FallingConfettiFromTopActivity extends AbstractActivity {
     private ConfettiManager confettiManager;
 
-    private void ensureConfettiManager() {
+    @Override
+    public ConfettiManager getConfettiManager() {
         if (confettiManager == null) {
             final int width = container.getWidth();
             final ConfettiManager.ConfettiSource confettiSource =
@@ -17,31 +18,6 @@ public class FallingConfettiFromTopActivity extends AbstractActivity {
                     .setRotationalAcceleration(360, 180)
                     .setTargetRotationalVelocity(360);
         }
-    }
-
-    @Override
-    protected void generateOnce() {
-        ensureConfettiManager();
-        confettiManager.setNumInitialCount(100)
-                .setEmissionDuration(0)
-                .animate();
-    }
-
-    @Override
-    protected void generateStream() {
-        ensureConfettiManager();
-        confettiManager.setNumInitialCount(0)
-                .setEmissionDuration(3000)
-                .setEmissionRate(100)
-                .animate();
-    }
-
-    @Override
-    protected void generateInfinite() {
-        ensureConfettiManager();
-        confettiManager.setNumInitialCount(0)
-                .setEmissionDuration(ConfettiManager.INFINITE_DURATION)
-                .setEmissionRate(50)
-                .animate();
+        return confettiManager;
     }
 }
