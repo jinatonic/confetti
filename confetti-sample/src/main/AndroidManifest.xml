@@ -19,6 +19,8 @@
             android:parentActivityName=".MainActivity" />
         <activity android:name=".ExplosionActivity"
             android:parentActivityName=".MainActivity" />
+        <activity android:name=".ShimmeringActivity"
+            android:parentActivityName=".MainActivity" />
 
     </application>
 

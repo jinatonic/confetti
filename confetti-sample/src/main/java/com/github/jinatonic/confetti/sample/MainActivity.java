@@ -27,6 +27,10 @@ public class MainActivity extends AppCompatActivity {
                     R.string.explosion_confetti,
                     ExplosionActivity.class
             ),
+            new ConfettiSample(
+                    R.string.shimmering_confetti,
+                    ShimmeringActivity.class
+            ),
     };
 
     @Override

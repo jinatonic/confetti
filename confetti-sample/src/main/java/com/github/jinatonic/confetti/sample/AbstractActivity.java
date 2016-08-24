@@ -21,7 +21,7 @@ public abstract class AbstractActivity extends AppCompatActivity implements
 
     protected int confettiSize;
     protected float velocitySuperSlow, velocitySlow, velocityNormal, velocityFast;
-    private int[] colors;
+    protected int goldDark, goldMed, gold, goldLight;
     private List<Bitmap> bitmaps;
 
     @Override
@@ -41,12 +41,12 @@ public abstract class AbstractActivity extends AppCompatActivity implements
         velocityNormal = res.getDimensionPixelSize(R.dimen.default_velocity_normal);
         velocityFast = res.getDimensionPixelSize(R.dimen.default_velocity_fast);
 
-        colors = new int[] {
-                res.getColor(R.color.gold_dark),
-                res.getColor(R.color.gold_med),
-                res.getColor(R.color.gold),
-                res.getColor(R.color.gold_light),
-        };
+        goldDark = res.getColor(R.color.gold_dark);
+        goldMed = res.getColor(R.color.gold_med);
+        gold = res.getColor(R.color.gold);
+        goldLight = res.getColor(R.color.gold_light);
+
+        final int[] colors = new int[] { goldDark, goldMed, gold, goldLight };
         bitmaps = Utils.generateConfettiBitmaps(colors, confettiSize);
     }
 

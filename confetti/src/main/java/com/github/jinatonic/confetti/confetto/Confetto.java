@@ -118,6 +118,7 @@ public abstract class Confetto {
                 // d = x + v * tm + 0.5 * a * tm * tm + tv * (t - tm)
                 // d - x - v * tm - 0.5 * a * tm * tm = tv * t - tv * tm
                 // d - x - v * tm - 0.5 * a * tm * tm + tv * tm = tv * t
+                // t = (d - x - v * tm - 0.5 * a * tm * tm + tv * tm) / tv
 
                 final double time =
                         (bound - initialPos - velocity * targetTime -
