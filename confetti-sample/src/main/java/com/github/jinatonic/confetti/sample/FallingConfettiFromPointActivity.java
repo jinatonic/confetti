@@ -16,20 +16,46 @@
 
 package com.github.jinatonic.confetti.sample;
 
-import com.github.jinatonic.confetti.ConfettiManager;
+import android.content.res.Resources;
+
+import com.github.jinatonic.confetti.CommonConfetti;
 import com.github.jinatonic.confetti.ConfettiSource;
 
 public class FallingConfettiFromPointActivity extends AbstractActivity {
+
     @Override
-    public ConfettiManager getConfettiManager() {
-        final ConfettiSource confettiSource = new ConfettiSource(-confettiSize, -confettiSize);
-        return new ConfettiManager(this, this, confettiSource, container)
+    protected void generateOnce() {
+        getCommonConfetti().oneShot();
+    }
+
+    @Override
+    protected void generateStream() {
+        getCommonConfetti().stream(3000);
+    }
+
+    @Override
+    protected void generateInfinite() {
+        getCommonConfetti().infinite();
+    }
+
+    private CommonConfetti getCommonConfetti() {
+        final int size = getResources().getDimensionPixelSize(R.dimen.default_confetti_size);
+        final ConfettiSource confettiSource = new ConfettiSource(-size, -size);
+        final CommonConfetti commonConfetti =
+                CommonConfetti.rainingConfetti(container, confettiSource, colors);
+
+        final Resources res = getResources();
+        final int velocitySlow = res.getDimensionPixelOffset(R.dimen.default_velocity_slow);
+        final int velocityNormal = res.getDimensionPixelOffset(R.dimen.default_velocity_normal);
+        final int velocityFast = res.getDimensionPixelOffset(R.dimen.default_velocity_fast);
+
+        // Further configure it
+        commonConfetti.getConfettiManager()
                 .setVelocityX(velocityFast, velocityNormal)
                 .setAccelerationX(-velocityNormal, velocitySlow)
-                .setTargetVelocityX(0, velocitySuperSlow)
-                .setVelocityY(velocityNormal, velocitySlow)
-                .setInitialRotation(180, 180)
-                .setRotationalAcceleration(360, 180)
-                .setTargetRotationalVelocity(360);
+                .setTargetVelocityX(0, velocitySlow / 2)
+                .setVelocityY(velocityNormal, velocitySlow);
+
+        return commonConfetti;
     }
 }

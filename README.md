@@ -19,15 +19,28 @@ Getting started
 Add the confetti dependency to your `build.gradle`.
 
 ```groovy
-compile 'com.github.jinatonic.confetti:confetti:1.1.0'
+compile 'com.github.jinatonic.confetti:confetti:1.0.0'
 ```
 
 
-Usage
------
+Simple usage
+------------
 
 The only thing you need to get confetti on your screen is a parent view to host the `ConfettiView`
 and thus the confetti animation. From this point on, this parent view is referred to as `container`.
+
+You can generate pre-configured confetti from `CommonConfetti`. You only need to provide it with
+the parent `container`, a `ConfettiSource`, and an array of possible colors for the confetti.
+The default confetti shapes are circle, triangle, and square.
+
+```java
+CommonConfetti.rainingConfetti(container, new int[] { Color.BLACK })
+        .infinite();
+```
+
+
+More custom usage
+-----------------
 
 First, we need to define what our individual [confetto](http://www.dictionary.com/browse/confetto)
 is through the `ConfettoGenerator`. Each call of `generateConfetto` must generate a brand new
@@ -135,9 +148,32 @@ you can choose to interpret rotation where each degree corresponds to a new shap
 This way, you can achieve some cool animation effects as the confetti flow through the screen.
 
 
+Changing confetti configuration mid-animation
+---------------------------------------------
+
+If you have a handle on the `ConfettiManager`, you can actually very easily change the configuration
+mid-animation for more unique experiences. For example:
+
+```java
+confettiManager.setEmissionRate(100)
+        .animate();
+
+new Handler().postDelayed(new Runnable() {
+    @Override public void run() {
+        confettiManager.setEmissionRate(20);
+    }
+}, 3000);
+```
+
+The above snippet will configure the initial emission rate to be 100 confetti per second and start
+the animation. After 3 seconds, it will reduce the emission rate to 20 confetti per second. This 
+applies to all attributes (e.g. changing velocity or acceleration based on some outside condition).
+
+
 Future development
 ==================
 
+* Add more samples and pre-configured confetti into `CommonConfetti`.
 * Support touch on each confetto so the user can drag and throw them on the screen.
 
 

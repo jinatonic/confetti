@@ -2,4 +2,13 @@
 <resources>
     <!-- Default elevation for the confetti -->
     <dimen name="confetti_default_elevation">9999dp</dimen>
+
+    <!-- Default configuration for some common confetti animations -->
+    <dimen name="default_confetti_size">6dp</dimen>
+
+    <dimen name="default_velocity_slow">50dp</dimen>
+    <dimen name="default_velocity_normal">100dp</dimen>
+    <dimen name="default_velocity_fast">200dp</dimen>
+
+    <dimen name="default_explosion_radius">100dp</dimen>
 </resources>

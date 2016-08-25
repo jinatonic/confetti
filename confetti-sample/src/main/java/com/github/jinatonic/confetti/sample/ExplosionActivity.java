@@ -16,32 +16,28 @@
 
 package com.github.jinatonic.confetti.sample;
 
-import android.graphics.Rect;
-
-import com.github.jinatonic.confetti.ConfettiManager;
-import com.github.jinatonic.confetti.ConfettiSource;
-import com.github.jinatonic.confetti.Utils;
+import com.github.jinatonic.confetti.CommonConfetti;
 
 public class ExplosionActivity extends AbstractActivity {
+
     @Override
-    public ConfettiManager getConfettiManager() {
+    protected void generateOnce() {
+        getCommonConfetti().oneShot();
+    }
+
+    @Override
+    protected void generateStream() {
+        getCommonConfetti().stream(3000);
+    }
+
+    @Override
+    protected void generateInfinite() {
+        getCommonConfetti().infinite();
+    }
+
+    private CommonConfetti getCommonConfetti() {
         final int centerX = container.getWidth() / 2;
         final int centerY = container.getHeight() / 5 * 2;
-        final int explosionRadius =
-                getResources().getDimensionPixelOffset(R.dimen.explosion_radius);
-
-        final ConfettiSource confettiSource = new ConfettiSource(centerX, centerY);
-        return new ConfettiManager(this, this, confettiSource, container)
-                .setTTL(1000)
-                .setBound(new Rect(
-                        centerX - explosionRadius, centerY - explosionRadius,
-                        centerX + explosionRadius, centerY + explosionRadius
-                ))
-                .setVelocityX(0, velocityFast)
-                .setVelocityY(0, velocityFast)
-                .enableFadeOut(Utils.getDefaultAlphaInterpolator())
-                .setInitialRotation(180, 180)
-                .setRotationalAcceleration(360, 180)
-                .setTargetRotationalVelocity(360);
+        return CommonConfetti.explosion(container, centerX, centerY, colors);
     }
 }
