@@ -47,6 +47,10 @@ public class MainActivity extends AppCompatActivity {
                     R.string.shimmering_confetti,
                     ShimmeringActivity.class
             ),
+            new ConfettiSample(
+                    R.string.ice_flakes_with_touch,
+                    FallingWithTouchActivity.class
+            ),
     };
 
     @Override

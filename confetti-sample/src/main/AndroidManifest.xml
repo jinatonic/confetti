@@ -21,6 +21,8 @@
             android:parentActivityName=".MainActivity" />
         <activity android:name=".ShimmeringActivity"
             android:parentActivityName=".MainActivity" />
+        <activity android:name=".FallingWithTouchActivity"
+            android:parentActivityName=".MainActivity" />
 
     </application>
 

@@ -20,6 +20,8 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.animation.Interpolator;
 
 /**
@@ -30,11 +32,13 @@ import android.view.animation.Interpolator;
  */
 public abstract class Confetto {
     private static final int MAX_ALPHA = 255;
+    private static final long RESET_ANIMATION_INITIAL_DELAY = -1;
 
     private final Matrix matrix = new Matrix();
     private final Paint workPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     // Configured coordinate states
+    private Rect bound;
     private long initialDelay;
     private float initialX, initialY, initialVelocityX, initialVelocityY,
             accelerationX, accelerationY;
@@ -59,6 +63,12 @@ public abstract class Confetto {
     private int alpha;
     private boolean startedAnimation, terminated;
 
+    // Touch events
+    private boolean touchOverride;
+    private VelocityTracker velocityTracker;
+    private float overrideX, overrideY;
+    private float overrideDeltaX, overrideDeltaY;
+
     /**
      * This method should be called after all of the confetto's state variables are configured
      * and before the confetto gets animated.
@@ -66,6 +76,8 @@ public abstract class Confetto {
      * @param bound the space in which the confetto can display in.
      */
     public void prepare(Rect bound) {
+        this.bound = bound;
+
         millisToReachTargetVelocityX = computeMillisToReachTarget(targetVelocityX,
                 initialVelocityX, accelerationX);
         millisToReachTargetVelocityY = computeMillisToReachTarget(targetVelocityY,
@@ -76,14 +88,73 @@ public abstract class Confetto {
         // Compute how long it would take to reach x/y bounds or reach TTL.
         millisToReachBound = ttl >= 0 ? ttl : Long.MAX_VALUE;
         final long timeToReachXBound = computeBound(initialX, initialVelocityX, accelerationX,
-                millisToReachTargetVelocityX, targetVelocityX, bound.left, bound.right);
+                millisToReachTargetVelocityX, targetVelocityX,
+                bound.left - getWidth(), bound.right);
         millisToReachBound = Math.min(timeToReachXBound, millisToReachBound);
         final long timeToReachYBound = computeBound(initialY, initialVelocityY, accelerationY,
-                millisToReachTargetVelocityY, targetVelocityY, bound.top, bound.bottom);
+                millisToReachTargetVelocityY, targetVelocityY,
+                bound.top - getHeight(), bound.bottom);
         millisToReachBound = Math.min(timeToReachYBound, millisToReachBound);
 
         configurePaint(workPaint);
     }
+
+    private boolean doesLocationIntercept(float x, float y) {
+        return currentX <= x && x <= currentX + getWidth() &&
+                currentY <= y && y <= currentY + getHeight();
+    }
+
+    public boolean onTouchDown(MotionEvent event) {
+        final float x = event.getX();
+        final float y= event.getY();
+
+        if (doesLocationIntercept(x, y)) {
+            this.touchOverride = true;
+            this.overrideX = x;
+            this.overrideY = y;
+            this.overrideDeltaX = currentX - x;
+            this.overrideDeltaY = currentY - y;
+
+            velocityTracker = VelocityTracker.obtain();
+            velocityTracker.addMovement(event);
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void onTouchMove(MotionEvent event) {
+        this.overrideX = event.getX();
+        this.overrideY = event.getY();
+        velocityTracker.addMovement(event);
+    }
+
+    public void onTouchUp(MotionEvent event) {
+        velocityTracker.addMovement(event);
+        velocityTracker.computeCurrentVelocity(1);
+
+        this.initialDelay = RESET_ANIMATION_INITIAL_DELAY;
+        this.initialX = event.getX() + overrideDeltaX;
+        this.initialY = event.getY() + overrideDeltaY;
+        this.initialVelocityX = velocityTracker.getXVelocity();
+        this.initialVelocityY = velocityTracker.getYVelocity();
+        this.initialRotation = currentRotation;
+
+        velocityTracker.recycle();
+        prepare(bound);
+        this.touchOverride = false;
+    }
+
+    /**
+     * @return the width of the confetto.
+     */
+    public abstract int getWidth();
+
+    /**
+     * @return the height of the confetto.
+     */
+    public abstract int getHeight();
 
     // Visible for testing
     protected static Long computeMillisToReachTarget(Float targetVelocity, float initialVelocity,
@@ -174,9 +245,8 @@ public abstract class Confetto {
         millisToReachTargetRotationalVelocity = null;
 
         ttl = 0;
-        fadeOutInterpolator = null;
-
         millisToReachBound = 0f;
+        fadeOutInterpolator = null;
 
         currentX = currentY = 0f;
         currentRotation = 0f;
@@ -198,9 +268,13 @@ public abstract class Confetto {
      * Update the confetto internal state based on the provided passed time.
      *
      * @param passedTime time since the beginning of the animation.
-     * @return whether this particular confetto has terminated.
+     * @return whether this particular confetto is still animating.
      */
     public boolean applyUpdate(long passedTime) {
+        if (initialDelay == RESET_ANIMATION_INITIAL_DELAY) {
+            initialDelay = passedTime;
+        }
+
         final long animatedTime = passedTime - initialDelay;
         startedAnimation = animatedTime >= 0;
 
@@ -221,10 +295,10 @@ public abstract class Confetto {
                 alpha = MAX_ALPHA;
             }
 
-            terminated = animatedTime >= millisToReachBound;
+            terminated = !touchOverride && animatedTime >= millisToReachBound;
         }
 
-        return terminated;
+        return !terminated;
     }
 
     private float computeDistance(long t, float xi, float vi, float ai, Long targetTime,
@@ -248,11 +322,22 @@ public abstract class Confetto {
      * @param canvas the canvas to draw on.
      */
     public void draw(Canvas canvas) {
-        if (startedAnimation && !terminated) {
-            matrix.reset();
-            workPaint.setAlpha(alpha);
-            drawInternal(canvas, matrix, workPaint, currentX, currentY, currentRotation);
+        if (touchOverride) {
+            draw(canvas, overrideX + overrideDeltaX, overrideY + overrideDeltaY, currentRotation);
+        } else if (startedAnimation && !terminated) {
+            draw(canvas, currentX ,currentY, currentRotation);
         }
+    }
+
+    private void draw(Canvas canvas, float x, float y, float rotation) {
+        canvas.save();
+
+        canvas.clipRect(bound);
+        matrix.reset();
+        workPaint.setAlpha(alpha);
+        drawInternal(canvas, matrix, workPaint, x, y, rotation);
+
+        canvas.restore();
     }
 
     /**

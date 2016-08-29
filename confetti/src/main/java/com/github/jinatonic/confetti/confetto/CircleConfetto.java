@@ -26,10 +26,22 @@ import android.graphics.Paint;
 public class CircleConfetto extends Confetto {
     private final int color;
     private final float radius;
+    private final int diamater;
 
     public CircleConfetto(int color, float radius) {
         this.color = color;
         this.radius = radius;
+        this.diamater = (int) (this.radius * 2);
+    }
+
+    @Override
+    public int getWidth() {
+        return diamater;
+    }
+
+    @Override
+    public int getHeight() {
+        return diamater;
     }
 
     @Override

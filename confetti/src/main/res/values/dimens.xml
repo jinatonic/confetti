@@ -5,6 +5,7 @@
 
     <!-- Default configuration for some common confetti animations -->
     <dimen name="default_confetti_size">6dp</dimen>
+    <dimen name="big_confetti_size">36dp</dimen>
 
     <dimen name="default_velocity_slow">50dp</dimen>
     <dimen name="default_velocity_normal">100dp</dimen>

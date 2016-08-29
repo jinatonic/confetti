@@ -32,6 +32,16 @@ public class BitmapConfetto extends Confetto {
     }
 
     @Override
+    public int getWidth() {
+        return bitmap.getWidth();
+    }
+
+    @Override
+    public int getHeight() {
+        return bitmap.getHeight();
+    }
+
+    @Override
     protected void drawInternal(Canvas canvas, Matrix matrix, Paint paint, float x, float y,
             float rotation) {
         matrix.preTranslate(x, y);
