@@ -1,3 +1,4 @@
+![](https://github.com/jinatonic/confetti/blob/master/assets/confetti_with_touch.gif)
 ![](https://github.com/jinatonic/confetti/blob/master/assets/falling_confetti_top.gif)
 ![](https://github.com/jinatonic/confetti/blob/master/assets/explosion_confetti.gif)
 ![](https://github.com/jinatonic/confetti/blob/master/assets/falling_confetti_point.gif)
@@ -134,6 +135,15 @@ Or, if you are lazy, you can just use `Utils.getDefaultAlphaInterpolator()`.
 Advanced usage
 ==============
 
+Enable touch and drag
+---------------------
+
+If you call `confettiManager.setTouchEnabled(true)`, you can allow the user to touch and drag
+the confetti that are on the screen. When the user let go of the confetti, the confetti will
+start at that location with the user initiated velocity and the pre-configured acceleration
+and resume animation from there.
+
+
 Custom Confetto
 ---------------
 
@@ -174,7 +184,6 @@ Future development
 ==================
 
 * Add more samples and pre-configured confetti into `CommonConfetti`.
-* Support touch on each confetto so the user can drag and throw them on the screen.
 
 
 License
