@@ -43,6 +43,14 @@ public class CommonConfetti {
 
     /** START Pre-configured confetti animations **/
 
+    /**
+     * @see #rainingConfetti(ViewGroup, ConfettiSource, int[]) but with the default confetti source
+     * to be the top of the confetti container viewgroup.
+     *
+     * @param container the container viewgroup to host the confetti animation.
+     * @param colors the set of colors to colorize the confetti bitmaps.
+     * @return the created common confetti object.
+     */
     public static CommonConfetti rainingConfetti(ViewGroup container, int[] colors) {
         final CommonConfetti commonConfetti = new CommonConfetti(container);
         final ConfettiSource confettiSource = new ConfettiSource(0, -defaultConfettiSize,
@@ -51,6 +59,14 @@ public class CommonConfetti {
         return commonConfetti;
     }
 
+    /**
+     * Configures a confetti manager that has confetti falling from the provided confetti source.
+     *
+     * @param container the container viewgroup to host the confetti animation.
+     * @param confettiSource the source of the confetti animation.
+     * @param colors the set of colors to colorize the confetti bitmaps.
+     * @return the created common confetti object.
+     */
     public static CommonConfetti rainingConfetti(ViewGroup container,
             ConfettiSource confettiSource, int[] colors) {
         final CommonConfetti commonConfetti = new CommonConfetti(container);
@@ -58,6 +74,16 @@ public class CommonConfetti {
         return commonConfetti;
     }
 
+    /**
+     * Configures a confetti manager that has confetti exploding out in all directions from the
+     * provided x and y coordinates.
+     *
+     * @param container the container viewgroup to host the confetti animation.
+     * @param x the x coordinate of the explosion source.
+     * @param y the y coordinate of the explosion source.
+     * @param colors the set of colors to colorize the confetti bitmaps.
+     * @return the created common confetti object.
+     */
     public static CommonConfetti explosion(ViewGroup container, int x, int y, int[] colors) {
         final CommonConfetti commonConfetti = new CommonConfetti(container);
         commonConfetti.configureExplosion(container, x, y, colors);
@@ -70,12 +96,20 @@ public class CommonConfetti {
         return confettiManager;
     }
 
+    /**
+     * Starts a one-shot animation that emits all of the confetti at once.
+     */
     public void oneShot() {
         confettiManager.setNumInitialCount(100)
                 .setEmissionDuration(0)
                 .animate();
     }
 
+    /**
+     * Starts a stream of confetti that animates for the provided duration.
+     *
+     * @param durationInMillis how long to animate the confetti for.
+     */
     public void stream(long durationInMillis) {
         confettiManager.setNumInitialCount(0)
                 .setEmissionDuration(durationInMillis)
@@ -83,6 +117,9 @@ public class CommonConfetti {
                 .animate();
     }
 
+    /**
+     * Starts an infinite stream of confetti.
+     */
     public void infinite() {
         confettiManager.setNumInitialCount(0)
                 .setEmissionDuration(ConfettiManager.INFINITE_DURATION)
