@@ -42,8 +42,8 @@ public class ShimmeringConfetto extends BitmapConfetto {
         this.waveLength = waveLength;
         this.halfWaveLength = waveLength / 2;
 
-        final long currentTime = SystemClock.elapsedRealtime();
-        this.randomStart = currentTime - random.nextInt((int) currentTime);
+        final int currentTime = Math.abs((int) SystemClock.elapsedRealtime());
+        this.randomStart = currentTime - random.nextInt(currentTime);
     }
 
     @Override
