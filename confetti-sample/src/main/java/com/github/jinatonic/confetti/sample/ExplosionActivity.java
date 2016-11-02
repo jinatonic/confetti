@@ -17,22 +17,23 @@
 package com.github.jinatonic.confetti.sample;
 
 import com.github.jinatonic.confetti.CommonConfetti;
+import com.github.jinatonic.confetti.ConfettiManager;
 
 public class ExplosionActivity extends AbstractActivity {
 
     @Override
-    protected void generateOnce() {
-        getCommonConfetti().oneShot();
+    protected ConfettiManager generateOnce() {
+        return getCommonConfetti().oneShot();
     }
 
     @Override
-    protected void generateStream() {
-        getCommonConfetti().stream(3000);
+    protected ConfettiManager generateStream() {
+        return getCommonConfetti().stream(3000);
     }
 
     @Override
-    protected void generateInfinite() {
-        getCommonConfetti().infinite();
+    protected ConfettiManager generateInfinite() {
+        return getCommonConfetti().infinite();
     }
 
     private CommonConfetti getCommonConfetti() {

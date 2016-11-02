@@ -17,24 +17,25 @@
 package com.github.jinatonic.confetti.sample;
 
 import com.github.jinatonic.confetti.CommonConfetti;
+import com.github.jinatonic.confetti.ConfettiManager;
 
 public class FallingConfettiFromTopActivity extends AbstractActivity {
 
     @Override
-    protected void generateOnce() {
-        CommonConfetti.rainingConfetti(container, colors)
+    protected ConfettiManager generateOnce() {
+        return CommonConfetti.rainingConfetti(container, colors)
                 .oneShot();
     }
 
     @Override
-    protected void generateStream() {
-        CommonConfetti.rainingConfetti(container, colors)
+    protected ConfettiManager generateStream() {
+        return CommonConfetti.rainingConfetti(container, colors)
                 .stream(3000);
     }
 
     @Override
-    protected void generateInfinite() {
-        CommonConfetti.rainingConfetti(container, colors)
+    protected ConfettiManager generateInfinite() {
+        return CommonConfetti.rainingConfetti(container, colors)
                 .infinite();
     }
 }

@@ -32,23 +32,23 @@ public class FallingWithTouchActivity extends AbstractActivity implements Confet
     }
 
     @Override
-    protected void generateOnce() {
-        getConfettiManager().setNumInitialCount(20)
+    protected ConfettiManager generateOnce() {
+        return getConfettiManager().setNumInitialCount(20)
                 .setEmissionDuration(0)
                 .animate();
     }
 
     @Override
-    protected void generateStream() {
-        getConfettiManager().setNumInitialCount(0)
+    protected ConfettiManager generateStream() {
+        return getConfettiManager().setNumInitialCount(0)
                 .setEmissionDuration(3000)
                 .setEmissionRate(20)
                 .animate();
     }
 
     @Override
-    protected void generateInfinite() {
-        getConfettiManager().setNumInitialCount(0)
+    protected ConfettiManager generateInfinite() {
+        return getConfettiManager().setNumInitialCount(0)
                 .setEmissionDuration(ConfettiManager.INFINITE_DURATION)
                 .setEmissionRate(20)
                 .animate();
