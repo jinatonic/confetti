@@ -51,23 +51,23 @@ public class ShimmeringActivity extends AbstractActivity implements ConfettoGene
     }
 
     @Override
-    protected void generateOnce() {
-        getConfettiManager().setNumInitialCount(100)
+    protected ConfettiManager generateOnce() {
+        return getConfettiManager().setNumInitialCount(100)
                 .setEmissionDuration(0)
                 .animate();
     }
 
     @Override
-    protected void generateStream() {
-        getConfettiManager().setNumInitialCount(0)
+    protected ConfettiManager generateStream() {
+        return getConfettiManager().setNumInitialCount(0)
                 .setEmissionDuration(3000)
                 .setEmissionRate(50)
                 .animate();
     }
 
     @Override
-    protected void generateInfinite() {
-        getConfettiManager().setNumInitialCount(0)
+    protected ConfettiManager generateInfinite() {
+        return getConfettiManager().setNumInitialCount(0)
                 .setEmissionDuration(ConfettiManager.INFINITE_DURATION)
                 .setEmissionRate(50)
                 .animate();

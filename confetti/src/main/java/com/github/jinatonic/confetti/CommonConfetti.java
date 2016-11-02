@@ -98,9 +98,11 @@ public class CommonConfetti {
 
     /**
      * Starts a one-shot animation that emits all of the confetti at once.
+     *
+     * @return the resulting {@link ConfettiManager} that's performing the animation.
      */
-    public void oneShot() {
-        confettiManager.setNumInitialCount(100)
+    public ConfettiManager oneShot() {
+        return confettiManager.setNumInitialCount(100)
                 .setEmissionDuration(0)
                 .animate();
     }
@@ -109,9 +111,10 @@ public class CommonConfetti {
      * Starts a stream of confetti that animates for the provided duration.
      *
      * @param durationInMillis how long to animate the confetti for.
+     * @return the resulting {@link ConfettiManager} that's performing the animation.
      */
-    public void stream(long durationInMillis) {
-        confettiManager.setNumInitialCount(0)
+    public ConfettiManager stream(long durationInMillis) {
+        return confettiManager.setNumInitialCount(0)
                 .setEmissionDuration(durationInMillis)
                 .setEmissionRate(50)
                 .animate();
@@ -119,9 +122,11 @@ public class CommonConfetti {
 
     /**
      * Starts an infinite stream of confetti.
+     *
+     * @return the resulting {@link ConfettiManager} that's performing the animation.
      */
-    public void infinite() {
-        confettiManager.setNumInitialCount(0)
+    public ConfettiManager infinite() {
+        return confettiManager.setNumInitialCount(0)
                 .setEmissionDuration(ConfettiManager.INFINITE_DURATION)
                 .setEmissionRate(50)
                 .animate();
