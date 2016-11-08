@@ -55,6 +55,7 @@ public abstract class Confetto {
     private Interpolator fadeOutInterpolator;
 
     private float millisToReachBound;
+    private float percentageAnimated;
 
     // Current draw states
     private float currentX, currentY;
@@ -246,6 +247,7 @@ public abstract class Confetto {
 
         ttl = 0;
         millisToReachBound = 0f;
+        percentageAnimated = 0f;
         fadeOutInterpolator = null;
 
         currentX = currentY = 0f;
@@ -296,6 +298,7 @@ public abstract class Confetto {
             }
 
             terminated = !touchOverride && animatedTime >= millisToReachBound;
+            percentageAnimated = Math.min(1f, animatedTime / millisToReachBound);
         }
 
         return !terminated;
@@ -323,19 +326,20 @@ public abstract class Confetto {
      */
     public void draw(Canvas canvas) {
         if (touchOverride) {
-            draw(canvas, overrideX + overrideDeltaX, overrideY + overrideDeltaY, currentRotation);
+            draw(canvas, overrideX + overrideDeltaX, overrideY + overrideDeltaY, currentRotation,
+                    percentageAnimated);
         } else if (startedAnimation && !terminated) {
-            draw(canvas, currentX ,currentY, currentRotation);
+            draw(canvas, currentX ,currentY, currentRotation, percentageAnimated);
         }
     }
 
-    private void draw(Canvas canvas, float x, float y, float rotation) {
+    private void draw(Canvas canvas, float x, float y, float rotation, float percentageAnimated) {
         canvas.save();
 
         canvas.clipRect(bound);
         matrix.reset();
         workPaint.setAlpha(alpha);
-        drawInternal(canvas, matrix, workPaint, x, y, rotation);
+        drawInternal(canvas, matrix, workPaint, x, y, rotation, percentageAnimated);
 
         canvas.restore();
     }
@@ -353,7 +357,7 @@ public abstract class Confetto {
      * @param rotation the rotation (in degrees) to draw the confetto.
      */
     protected abstract void drawInternal(Canvas canvas, Matrix matrix, Paint paint, float x,
-            float y, float rotation);
+            float y, float rotation, float percentAnimated);
 
 
     /**
