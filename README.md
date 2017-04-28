@@ -30,6 +30,11 @@ Simple usage
 The only thing you need to get confetti on your screen is a parent view to host the `ConfettiView`
 and thus the confetti animation. From this point on, this parent view is referred to as `container`.
 
+Please note that the library uses measurements from `container` to figure out how to best animate
+the confetti. If the `container` is not measured when creating the confetti, then nothing will
+show up on the screen. A common pitfall is creating confetti inside activity lifecycle as the views
+are most likely not measured at those points.
+
 You can generate pre-configured confetti from `CommonConfetti`. You only need to provide it with
 the parent `container`, a `ConfettiSource`, and an array of possible colors for the confetti.
 The default confetti shapes are circle, triangle, and square.
