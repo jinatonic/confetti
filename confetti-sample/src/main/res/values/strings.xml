@@ -10,4 +10,7 @@
     <string name="explosion_confetti">Explosion</string>
     <string name="shimmering_confetti">Shimmering confetti</string>
     <string name="ice_flakes_with_touch">Falling ice flakes with touch</string>
+    <string name="ice_flakes_with_listener">Falling ice flakes with listener</string>
+
+    <string name="num_confetti_desc">Active confetti count: %1$d</string>
 </resources>
