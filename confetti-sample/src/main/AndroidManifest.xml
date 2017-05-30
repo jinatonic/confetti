@@ -23,6 +23,8 @@
             android:parentActivityName=".MainActivity" />
         <activity android:name=".FallingWithTouchActivity"
             android:parentActivityName=".MainActivity" />
+        <activity android:name=".FallingConfettiWithListenerActivity"
+            android:parentActivityName=".MainActivity" />
 
     </application>
 

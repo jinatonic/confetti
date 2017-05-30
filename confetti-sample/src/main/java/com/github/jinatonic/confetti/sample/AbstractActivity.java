@@ -18,6 +18,7 @@ package com.github.jinatonic.confetti.sample;
 
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.LayoutRes;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +39,7 @@ public abstract class AbstractActivity extends AppCompatActivity implements View
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_confetti);
+        setContentView(getLayoutRes());
 
         container = (ViewGroup) findViewById(R.id.container);
         findViewById(R.id.generate_confetti_once_btn).setOnClickListener(this);
@@ -52,6 +53,11 @@ public abstract class AbstractActivity extends AppCompatActivity implements View
         gold = res.getColor(R.color.gold);
         goldLight = res.getColor(R.color.gold_light);
         colors = new int[] { goldDark, goldMed, gold, goldLight };
+    }
+
+    @LayoutRes
+    protected int getLayoutRes() {
+        return R.layout.activity_confetti;
     }
 
     @Override

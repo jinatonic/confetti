@@ -74,6 +74,8 @@ public class ConfettiManager {
     private Float targetRotationalVelocity, targetRotationalVelocityDeviation;
     private long ttl;
 
+    private ConfettiAnimationListener animationListener;
+
     public ConfettiManager(Context context, ConfettoGenerator confettoGenerator,
             ConfettiSource confettiSource, ViewGroup parentView) {
         this(confettoGenerator, confettiSource, parentView, ConfettiView.newInstance(context));
@@ -462,11 +464,26 @@ public class ConfettiManager {
     }
 
     /**
+     * Sets a {@link ConfettiAnimationListener} for this confetti manager.
+     *
+     * @param listener the animation listener, or null to clear out the existing listener.
+     * @return the confetti manager so that the set calls can be chained.
+     */
+    public ConfettiManager setConfettiAnimationListener(ConfettiAnimationListener listener) {
+        this.animationListener = listener;
+        return this;
+    }
+
+    /**
      * Start the confetti animation configured by this manager.
      *
      * @return the confetti manager itself that just started animating.
      */
     public ConfettiManager animate() {
+        if (animationListener != null) {
+            animationListener.onAnimationStart(this);
+        }
+
         cleanupExistingAnimation();
         attachConfettiViewToParent();
         addNewConfetti(numInitialCount, 0);
@@ -482,6 +499,10 @@ public class ConfettiManager {
             animator.cancel();
         }
         confettiView.terminate();
+
+        if (animationListener != null) {
+            animationListener.onAnimationEnd(this);
+        }
     }
 
     private void cleanupExistingAnimation() {
@@ -492,7 +513,7 @@ public class ConfettiManager {
         lastEmittedTimestamp = 0;
         final Iterator<Confetto> iterator = confetti.iterator();
         while (iterator.hasNext()) {
-            recycledConfetti.add(iterator.next());
+            removeConfetto(iterator.next());
             iterator.remove();
         }
     }
@@ -518,7 +539,7 @@ public class ConfettiManager {
                 confetto = confettoGenerator.generateConfetto(random);
             }
             configureConfetto(confetto, confettiSource, random, initialDelay);
-            this.confetti.add(confetto);
+            addConfetto(confetto);
         }
     }
 
@@ -568,9 +589,23 @@ public class ConfettiManager {
             final Confetto confetto = iterator.next();
             if (!confetto.applyUpdate(elapsedTime)) {
                 iterator.remove();
-                recycledConfetti.add(confetto);
+                removeConfetto(confetto);
             }
         }
+    }
+
+    private void addConfetto(Confetto confetto) {
+        this.confetti.add(confetto);
+        if (animationListener != null) {
+            animationListener.onConfettoEnter(confetto);
+        }
+    }
+
+    private void removeConfetto(Confetto confetto) {
+        if (this.animationListener != null) {
+            this.animationListener.onConfettoExit(confetto);
+        }
+        recycledConfetti.add(confetto);
     }
 
     private void configureConfetto(Confetto confetto, ConfettiSource confettiSource,
@@ -606,5 +641,19 @@ public class ConfettiManager {
     private float getVarianceAmount(float base, float deviation, Random random) {
         // Normalize random to be [-1, 1] rather than [0, 1]
         return base + (deviation * (random.nextFloat() * 2 - 1));
+    }
+
+    public interface ConfettiAnimationListener {
+        void onAnimationStart(ConfettiManager confettiManager);
+        void onAnimationEnd(ConfettiManager confettiManager);
+        void onConfettoEnter(Confetto confetto);
+        void onConfettoExit(Confetto confetto);
+    }
+
+    public class ConfettiAnimationListenerAdapter implements ConfettiAnimationListener {
+        @Override public void onAnimationStart(ConfettiManager confettiManager) {}
+        @Override public void onAnimationEnd(ConfettiManager confettiManager) {}
+        @Override public void onConfettoEnter(Confetto confetto) {}
+        @Override public void onConfettoExit(Confetto confetto) {}
     }
 }
