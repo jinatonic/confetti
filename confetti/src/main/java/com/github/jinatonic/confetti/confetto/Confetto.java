@@ -20,6 +20,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.animation.Interpolator;
@@ -58,8 +59,8 @@ public abstract class Confetto {
     private float percentageAnimated;
 
     // Current draw states
-    private float currentX, currentY;
-    private float currentRotation;
+    private float currentX, currentY, currentVelocityX, currentVelocityY;
+    private float currentRotation, currentRotationalVelocity;
     // alpha is [0, 255]
     private int alpha;
     private boolean startedAnimation, terminated;
@@ -143,6 +144,7 @@ public abstract class Confetto {
         this.initialRotation = currentRotation;
 
         velocityTracker.recycle();
+        velocityTracker = null;
         prepare(bound);
         this.touchOverride = false;
     }
@@ -251,6 +253,7 @@ public abstract class Confetto {
         fadeOutInterpolator = null;
 
         currentX = currentY = 0f;
+        currentVelocityX = currentVelocityY = 0f;
         currentRotation = 0f;
         alpha = MAX_ALPHA;
         startedAnimation = false;
@@ -281,13 +284,21 @@ public abstract class Confetto {
         startedAnimation = animatedTime >= 0;
 
         if (startedAnimation && !terminated) {
-            currentX = computeDistance(animatedTime, initialX, initialVelocityX, accelerationX,
+            Pair<Float, Float> xPair = computeDistance(animatedTime, initialX, initialVelocityX, accelerationX,
                     millisToReachTargetVelocityX, targetVelocityX);
-            currentY = computeDistance(animatedTime, initialY, initialVelocityY, accelerationY,
+            currentX = xPair.first;
+            currentVelocityX = xPair.second;
+
+            Pair<Float, Float> yPair = computeDistance(animatedTime, initialY, initialVelocityY, accelerationY,
                     millisToReachTargetVelocityY, targetVelocityY);
-            currentRotation = computeDistance(animatedTime, initialRotation,
+            currentY = yPair.first;
+            currentVelocityY = yPair.second;
+
+            Pair<Float, Float> rotationPair = computeDistance(animatedTime, initialRotation,
                     initialRotationalVelocity, rotationalAcceleration,
                     millisToReachTargetRotationalVelocity, targetRotationalVelocity);
+            currentRotation = rotationPair.first;
+            currentRotationalVelocity = rotationPair.second;
 
             if (fadeOutInterpolator != null) {
                 final float interpolatedTime =
@@ -304,18 +315,22 @@ public abstract class Confetto {
         return !terminated;
     }
 
-    private float computeDistance(long t, float xi, float vi, float ai, Long targetTime,
-            Float vTarget) {
+    private Pair<Float, Float> computeDistance(long t, float xi, float vi, float ai, Long targetTime, Float vTarget) {
         if (targetTime == null || t < targetTime) {
-            // distance covered with linear acceleration
+            // velocity with constant acceleration
+            float vX = ai * t + vi;
+            // distance covered with constant acceleration
             // distance = xi + vi * t + 1/2 * a * t^2
-            return xi + vi * t + 0.5f * ai * t * t;
+            float x = xi + vi * t + 0.5f * ai * t * t;
+            return Pair.create(x, vX);
         } else {
-            // distance covered with linear acceleration + distance covered with max velocity
+            // velocity with constant acceleration
+            float vX = ai * t + vi;
+            // distance covered with constant acceleration + distance covered with max velocity
             // distance = xi + vi * targetTime + 1/2 * a * targetTime^2
             //     + (t - targetTime) * vTarget;
-            return xi + vi * targetTime + 0.5f * ai * targetTime * targetTime
-                    + (t - targetTime) * vTarget;
+            float x = xi + vi * targetTime + 0.5f * ai * targetTime * targetTime + (t - targetTime) * vTarget;
+            return Pair.create(x, vX);
         }
     }
 
@@ -326,20 +341,20 @@ public abstract class Confetto {
      */
     public void draw(Canvas canvas) {
         if (touchOverride) {
-            draw(canvas, overrideX + overrideDeltaX, overrideY + overrideDeltaY, currentRotation,
-                    percentageAnimated);
+            velocityTracker.computeCurrentVelocity(1);
+            draw(canvas, overrideX + overrideDeltaX, overrideY + overrideDeltaY, velocityTracker.getXVelocity(), velocityTracker.getYVelocity(), currentRotation, currentRotationalVelocity, percentageAnimated);
         } else if (startedAnimation && !terminated) {
-            draw(canvas, currentX ,currentY, currentRotation, percentageAnimated);
+            draw(canvas, currentX, currentY, currentVelocityX, currentVelocityY, currentRotation, currentRotationalVelocity, percentageAnimated);
         }
     }
 
-    private void draw(Canvas canvas, float x, float y, float rotation, float percentageAnimated) {
+    private void draw(Canvas canvas, float x, float y, float vX, float vY, float rotation, float vRotation, float percentageAnimated) {
         canvas.save();
 
         canvas.clipRect(bound);
         matrix.reset();
         workPaint.setAlpha(alpha);
-        drawInternal(canvas, matrix, workPaint, x, y, rotation, percentageAnimated);
+        drawInternal(canvas, matrix, workPaint, x, y, vX, vY, rotation, vRotation, percentageAnimated);
 
         canvas.restore();
     }
@@ -356,8 +371,7 @@ public abstract class Confetto {
      * @param y the y position of the confetto relative to the canvas.
      * @param rotation the rotation (in degrees) to draw the confetto.
      */
-    protected abstract void drawInternal(Canvas canvas, Matrix matrix, Paint paint, float x,
-            float y, float rotation, float percentAnimated);
+    protected abstract void drawInternal(Canvas canvas, Matrix matrix, Paint paint, float x, float y, float vX, float vY, float rotation, float vRotation, float percentageAnimated);
 
 
     /**
