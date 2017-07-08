@@ -47,8 +47,7 @@ public class ShimmeringConfetto extends BitmapConfetto {
     }
 
     @Override
-    protected void drawInternal(Canvas canvas, Matrix matrix, Paint paint, float x, float y,
-            float rotation, float percentageAnimated) {
+    protected void drawInternal(Canvas canvas, Matrix matrix, Paint paint, float x, float y, float vX, float vY, float rotation, float vRotation, float percentageAnimated) {
         final long currTime = SystemClock.elapsedRealtime();
         final long fraction = (currTime - randomStart) % waveLength;
         final float animated = fraction < halfWaveLength
@@ -58,6 +57,6 @@ public class ShimmeringConfetto extends BitmapConfetto {
         final int color = (int) evaluator.evaluate(animated, fromColor, toColor);
         final ColorFilter colorFilter = new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP);
         paint.setColorFilter(colorFilter);
-        super.drawInternal(canvas, matrix, paint, x, y, rotation, percentageAnimated);
+        super.drawInternal(canvas, matrix, paint, x, y, vX, vY, rotation, vRotation, percentageAnimated);
     }
 }

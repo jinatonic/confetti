@@ -42,8 +42,7 @@ public class BitmapConfetto extends Confetto {
     }
 
     @Override
-    protected void drawInternal(Canvas canvas, Matrix matrix, Paint paint, float x, float y,
-            float rotation, float percentageAnimated) {
+    protected void drawInternal(Canvas canvas, Matrix matrix, Paint paint, float x, float y, float vX, float vY, float rotation, float vRotation, float percentageAnimated) {
         matrix.preTranslate(x, y);
         matrix.preRotate(rotation, bitmapCenterX, bitmapCenterY);
         canvas.drawBitmap(bitmap, matrix, paint);
