@@ -355,6 +355,7 @@ public abstract class Confetto {
      * @param x the x position of the confetto relative to the canvas.
      * @param y the y position of the confetto relative to the canvas.
      * @param rotation the rotation (in degrees) to draw the confetto.
+     * @param percentAnimated the percentage [0f, 1f] of animation progress for this confetto.
      */
     protected abstract void drawInternal(Canvas canvas, Matrix matrix, Paint paint, float x,
             float y, float rotation, float percentAnimated);

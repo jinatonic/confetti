@@ -1,3 +1,7 @@
+Version 1.1.1 *(2017-12-11)*
+----------------------------
+* Add animation listener interface for the ConfettiManager.
+
 Version 1.1.0 *(2016-11-08)*
 ----------------------------
 * Add support for percentage animated in Confetto#drawInternal.
