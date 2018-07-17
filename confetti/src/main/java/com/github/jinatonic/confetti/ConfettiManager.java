@@ -650,7 +650,7 @@ public class ConfettiManager {
         void onConfettoExit(Confetto confetto);
     }
 
-    public class ConfettiAnimationListenerAdapter implements ConfettiAnimationListener {
+    public static class ConfettiAnimationListenerAdapter implements ConfettiAnimationListener {
         @Override public void onAnimationStart(ConfettiManager confettiManager) {}
         @Override public void onAnimationEnd(ConfettiManager confettiManager) {}
         @Override public void onConfettoEnter(Confetto confetto) {}
