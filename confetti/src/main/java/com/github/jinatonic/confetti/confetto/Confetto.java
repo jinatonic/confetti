@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2016 Robinhood Markets, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,8 +27,8 @@ import android.view.animation.Interpolator;
 /**
  * Abstract class that represents a single confetto on the screen. This class holds all of the
  * internal states for the confetto to help it animate.
- *
- * <p>All of the configured states are in milliseconds, e.g. pixels per millisecond for velocity.
+ * <p>
+ * All of the configured states are in milliseconds, e.g. pixels per millisecond for velocity.
  */
 public abstract class Confetto {
     private static final int MAX_ALPHA = 255;
@@ -36,6 +36,7 @@ public abstract class Confetto {
 
     private final Matrix matrix = new Matrix();
     private final Paint workPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final float[] workPairs = new float[2];
 
     // Configured coordinate states
     private Rect bound;
@@ -44,22 +45,18 @@ public abstract class Confetto {
             accelerationX, accelerationY;
     private Float targetVelocityX, targetVelocityY;
     private Long millisToReachTargetVelocityX, millisToReachTargetVelocityY;
-
     // Configured rotation states
     private float initialRotation, initialRotationalVelocity, rotationalAcceleration;
     private Float targetRotationalVelocity;
     private Long millisToReachTargetRotationalVelocity;
-
     // Configured animation states
     private long ttl;
     private Interpolator fadeOutInterpolator;
-
     private float millisToReachBound;
     private float percentageAnimated;
-
     // Current draw states
-    private float currentX, currentY;
-    private float currentRotation;
+    private float currentX, currentY, currentRotation;
+    protected float currentVelocityX, currentVelocityY, currentRotationalVelocity;
     // alpha is [0, 255]
     private int alpha;
     private boolean startedAnimation, terminated;
@@ -107,7 +104,7 @@ public abstract class Confetto {
 
     public boolean onTouchDown(MotionEvent event) {
         final float x = event.getX();
-        final float y= event.getY();
+        final float y = event.getY();
 
         if (doesLocationIntercept(x, y)) {
             this.touchOverride = true;
@@ -143,6 +140,7 @@ public abstract class Confetto {
         this.initialRotation = currentRotation;
 
         velocityTracker.recycle();
+        velocityTracker = null;
         prepare(bound);
         this.touchOverride = false;
     }
@@ -251,6 +249,7 @@ public abstract class Confetto {
         fadeOutInterpolator = null;
 
         currentX = currentY = 0f;
+        currentVelocityX = currentVelocityY = 0f;
         currentRotation = 0f;
         alpha = MAX_ALPHA;
         startedAnimation = false;
@@ -281,13 +280,22 @@ public abstract class Confetto {
         startedAnimation = animatedTime >= 0;
 
         if (startedAnimation && !terminated) {
-            currentX = computeDistance(animatedTime, initialX, initialVelocityX, accelerationX,
+
+            computeDistance(workPairs, animatedTime, initialX, initialVelocityX, accelerationX,
                     millisToReachTargetVelocityX, targetVelocityX);
-            currentY = computeDistance(animatedTime, initialY, initialVelocityY, accelerationY,
+            currentX = workPairs[0];
+            currentVelocityX = workPairs[1];
+
+            computeDistance(workPairs, animatedTime, initialY, initialVelocityY, accelerationY,
                     millisToReachTargetVelocityY, targetVelocityY);
-            currentRotation = computeDistance(animatedTime, initialRotation,
+            currentY = workPairs[0];
+            currentVelocityY = workPairs[1];
+
+            computeDistance(workPairs, animatedTime, initialRotation,
                     initialRotationalVelocity, rotationalAcceleration,
                     millisToReachTargetRotationalVelocity, targetRotationalVelocity);
+            currentRotation = workPairs[0];
+            currentRotationalVelocity = workPairs[1];
 
             if (fadeOutInterpolator != null) {
                 final float interpolatedTime =
@@ -304,18 +312,23 @@ public abstract class Confetto {
         return !terminated;
     }
 
-    private float computeDistance(long t, float xi, float vi, float ai, Long targetTime,
-            Float vTarget) {
+    private void computeDistance(float[] pair, long t, float xi, float vi, float ai, Long targetTime,
+                                 Float vTarget) {
+        // velocity with constant acceleration
+        float vX = ai * t + vi;
+        pair[1] = vX;
+
         if (targetTime == null || t < targetTime) {
-            // distance covered with linear acceleration
+            // distance covered with constant acceleration
             // distance = xi + vi * t + 1/2 * a * t^2
-            return xi + vi * t + 0.5f * ai * t * t;
+            float x = xi + vi * t + 0.5f * ai * t * t;
+            pair[0] = x;
         } else {
-            // distance covered with linear acceleration + distance covered with max velocity
+            // distance covered with constant acceleration + distance covered with max velocity
             // distance = xi + vi * targetTime + 1/2 * a * targetTime^2
             //     + (t - targetTime) * vTarget;
-            return xi + vi * targetTime + 0.5f * ai * targetTime * targetTime
-                    + (t - targetTime) * vTarget;
+            float x = xi + vi * targetTime + 0.5f * ai * targetTime * targetTime + (t - targetTime) * vTarget;
+            pair[0] = x;
         }
     }
 
@@ -326,10 +339,12 @@ public abstract class Confetto {
      */
     public void draw(Canvas canvas) {
         if (touchOverride) {
-            draw(canvas, overrideX + overrideDeltaX, overrideY + overrideDeltaY, currentRotation,
-                    percentageAnimated);
+            velocityTracker.computeCurrentVelocity(1);
+            this.currentVelocityX = velocityTracker.getXVelocity();
+            this.currentVelocityY = velocityTracker.getYVelocity();
+            draw(canvas, overrideX + overrideDeltaX, overrideY + overrideDeltaY, currentRotation, percentageAnimated);
         } else if (startedAnimation && !terminated) {
-            draw(canvas, currentX ,currentY, currentRotation, percentageAnimated);
+            draw(canvas, currentX, currentY, currentRotation, percentageAnimated);
         }
     }
 
