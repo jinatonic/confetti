@@ -64,7 +64,7 @@ public abstract class Confetto {
     // Touch events
     private boolean touchOverride;
     private VelocityTracker velocityTracker;
-    private float overrideX, overrideY;
+    private float overrideX, overrideY, overrideVelocityX, overrideVelocityY;
     private float overrideDeltaX, overrideDeltaY;
 
     /**
@@ -126,6 +126,10 @@ public abstract class Confetto {
         this.overrideX = event.getX();
         this.overrideY = event.getY();
         velocityTracker.addMovement(event);
+
+        velocityTracker.computeCurrentVelocity(1);
+        this.overrideVelocityX = velocityTracker.getXVelocity();
+        this.overrideVelocityY = velocityTracker.getYVelocity();
     }
 
     public void onTouchUp(MotionEvent event) {
@@ -339,9 +343,10 @@ public abstract class Confetto {
      */
     public void draw(Canvas canvas) {
         if (touchOverride) {
-            velocityTracker.computeCurrentVelocity(1);
-            this.currentVelocityX = velocityTracker.getXVelocity();
-            this.currentVelocityY = velocityTracker.getYVelocity();
+            // Replace time-calculated velocities with touch-velocities
+            currentVelocityX = overrideVelocityX;
+            currentVelocityY = overrideVelocityY;
+
             draw(canvas, overrideX + overrideDeltaX, overrideY + overrideDeltaY, currentRotation, percentageAnimated);
         } else if (startedAnimation && !terminated) {
             draw(canvas, currentX, currentY, currentRotation, percentageAnimated);
