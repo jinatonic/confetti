@@ -41,7 +41,7 @@ public class CommonConfetti {
         ensureStaticResources(container);
     }
 
-    /** START Pre-configured confetti animations **/
+    // region Pre-configured confetti animations
 
     /**
      * @see #rainingConfetti(ViewGroup, ConfettiSource, int[]) but with the default confetti source
@@ -90,7 +90,7 @@ public class CommonConfetti {
         return commonConfetti;
     }
 
-    /** END Pre-configured confetti animations **/
+    // endregion
 
     public ConfettiManager getConfettiManager() {
         return confettiManager;

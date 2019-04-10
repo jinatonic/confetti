@@ -381,9 +381,7 @@ public abstract class Confetto {
             float y, float rotation, float percentAnimated);
 
 
-    /**
-     * Helper methods to set all of the necessary values for the confetto.
-     */
+    // region Helper methods to set all of the necessary values for the confetto.
 
     public void setInitialDelay(long val) {
         this.initialDelay = val;
@@ -444,4 +442,6 @@ public abstract class Confetto {
     public void setFadeOut(Interpolator fadeOutInterpolator) {
         this.fadeOutInterpolator = fadeOutInterpolator;
     }
+
+    // endregion
 }
