@@ -538,7 +538,11 @@ public class ConfettiManager {
             if (confetto == null) {
                 confetto = confettoGenerator.generateConfetto(random);
             }
+
+            confetto.reset();
             configureConfetto(confetto, confettiSource, random, initialDelay);
+            confetto.prepare(bound);
+
             addConfetto(confetto);
         }
     }
@@ -608,10 +612,8 @@ public class ConfettiManager {
         recycledConfetti.add(confetto);
     }
 
-    private void configureConfetto(Confetto confetto, ConfettiSource confettiSource,
+    protected void configureConfetto(Confetto confetto, ConfettiSource confettiSource,
             Random random, long initialDelay) {
-        confetto.reset();
-
         confetto.setInitialDelay(initialDelay);
         confetto.setInitialX(confettiSource.getInitialX(random.nextFloat()));
         confetto.setInitialY(confettiSource.getInitialY(random.nextFloat()));
@@ -634,8 +636,6 @@ public class ConfettiManager {
                         random));
         confetto.setTTL(ttl);
         confetto.setFadeOut(fadeOutInterpolator);
-
-        confetto.prepare(bound);
     }
 
     private float getVarianceAmount(float base, float deviation, Random random) {
