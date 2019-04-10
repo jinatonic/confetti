@@ -29,15 +29,19 @@ public class FallingConfettiWithListenerActivity extends AbstractActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        numConfettiTxt = (TextView) findViewById(R.id.num_confetti_txt);
+        numConfettiTxt = findViewById(R.id.num_confetti_txt);
 
         final Resources res = getResources();
         size = res.getDimensionPixelSize(R.dimen.big_confetti_size);
         velocitySlow = res.getDimensionPixelOffset(R.dimen.default_velocity_slow);
         velocityNormal = res.getDimensionPixelOffset(R.dimen.default_velocity_normal);
 
-        bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(res, R.drawable.snowflake),
-                size, size, false);
+        bitmap = Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(res, R.drawable.snowflake),
+                size,
+                size,
+                false
+        );
     }
 
     @Override

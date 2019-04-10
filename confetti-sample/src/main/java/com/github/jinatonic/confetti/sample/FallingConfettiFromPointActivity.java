@@ -54,7 +54,7 @@ public class FallingConfettiFromPointActivity extends AbstractActivity {
         commonConfetti.getConfettiManager()
                 .setVelocityX(velocityFast, velocityNormal)
                 .setAccelerationX(-velocityNormal, velocitySlow)
-                .setTargetVelocityX(0, velocitySlow / 2)
+                .setTargetVelocityX(0, velocitySlow / 2f)
                 .setVelocityY(velocityNormal, velocitySlow);
 
         return commonConfetti;

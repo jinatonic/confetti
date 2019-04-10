@@ -18,8 +18,6 @@ package com.github.jinatonic.confetti.sample;
 
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -27,6 +25,9 @@ import com.github.jinatonic.confetti.ConfettiManager;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.LayoutRes;
+import androidx.appcompat.app.AppCompatActivity;
 
 public abstract class AbstractActivity extends AppCompatActivity implements View.OnClickListener {
     protected ViewGroup container;
@@ -41,7 +42,7 @@ public abstract class AbstractActivity extends AppCompatActivity implements View
         super.onCreate(savedInstanceState);
         setContentView(getLayoutRes());
 
-        container = (ViewGroup) findViewById(R.id.container);
+        container = findViewById(R.id.container);
         findViewById(R.id.generate_confetti_once_btn).setOnClickListener(this);
         findViewById(R.id.generate_confetti_stream_btn).setOnClickListener(this);
         findViewById(R.id.generate_confetti_infinite_btn).setOnClickListener(this);
