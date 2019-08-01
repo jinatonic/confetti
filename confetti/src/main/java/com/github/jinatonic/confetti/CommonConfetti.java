@@ -44,18 +44,27 @@ public class CommonConfetti {
     // region Pre-configured confetti animations
 
     /**
-     * @see #rainingConfetti(ViewGroup, ConfettiSource, int[]) but with the default confetti source
+     * @see #rainingConfetti(ViewGroup, ConfettiSource, int[], Shape) but with the default confetti source
      * to be the top of the confetti container viewgroup.
      *
      * @param container the container viewgroup to host the confetti animation.
      * @param colors the set of colors to colorize the confetti bitmaps.
      * @return the created common confetti object.
      */
+    public static CommonConfetti rainingConfetti(ViewGroup container, int[] colors, Shape shape) {
+        final CommonConfetti commonConfetti = new CommonConfetti(container);
+        final ConfettiSource confettiSource = new ConfettiSource(0, -defaultConfettiSize,
+                container.getWidth(), -defaultConfettiSize);
+        commonConfetti.configureRainingConfetti(container, confettiSource, colors, shape);
+        return commonConfetti;
+    }
+
+    //Simpler Method
     public static CommonConfetti rainingConfetti(ViewGroup container, int[] colors) {
         final CommonConfetti commonConfetti = new CommonConfetti(container);
         final ConfettiSource confettiSource = new ConfettiSource(0, -defaultConfettiSize,
                 container.getWidth(), -defaultConfettiSize);
-        commonConfetti.configureRainingConfetti(container, confettiSource, colors);
+        commonConfetti.configureRainingConfetti(container, confettiSource, colors, Shape.MIXED);
         return commonConfetti;
     }
 
@@ -68,9 +77,9 @@ public class CommonConfetti {
      * @return the created common confetti object.
      */
     public static CommonConfetti rainingConfetti(ViewGroup container,
-            ConfettiSource confettiSource, int[] colors) {
+            ConfettiSource confettiSource, int[] colors, Shape shape) {
         final CommonConfetti commonConfetti = new CommonConfetti(container);
-        commonConfetti.configureRainingConfetti(container, confettiSource, colors);
+        commonConfetti.configureRainingConfetti(container, confettiSource, colors, shape);
         return commonConfetti;
     }
 
@@ -84,12 +93,18 @@ public class CommonConfetti {
      * @param colors the set of colors to colorize the confetti bitmaps.
      * @return the created common confetti object.
      */
-    public static CommonConfetti explosion(ViewGroup container, int x, int y, int[] colors) {
+    public static CommonConfetti explosion(ViewGroup container, int x, int y, int[] colors, Shape shape) {
         final CommonConfetti commonConfetti = new CommonConfetti(container);
-        commonConfetti.configureExplosion(container, x, y, colors);
+        commonConfetti.configureExplosion(container, x, y, colors, shape);
         return commonConfetti;
     }
 
+    //Simpler Method
+    public static CommonConfetti explosion(ViewGroup container, int x, int y, int[] colors) {
+        final CommonConfetti commonConfetti = new CommonConfetti(container);
+        commonConfetti.configureExplosion(container, x, y, colors, Shape.MIXED);
+        return commonConfetti;
+    }
     // endregion
 
     public ConfettiManager getConfettiManager() {
@@ -132,8 +147,8 @@ public class CommonConfetti {
                 .animate();
     }
 
-    private ConfettoGenerator getDefaultGenerator(int[] colors) {
-        final List<Bitmap> bitmaps = Utils.generateConfettiBitmaps(colors, defaultConfettiSize);
+    private ConfettoGenerator getDefaultGenerator(int[] colors, Shape shape) {
+        final List<Bitmap> bitmaps = Utils.generateConfettiBitmaps(colors, defaultConfettiSize, shape);
         final int numBitmaps = bitmaps.size();
         return new ConfettoGenerator() {
             @Override
@@ -144,9 +159,9 @@ public class CommonConfetti {
     }
 
     private void configureRainingConfetti(ViewGroup container, ConfettiSource confettiSource,
-            int[] colors) {
+            int[] colors, Shape shape) {
         final Context context = container.getContext();
-        final ConfettoGenerator generator = getDefaultGenerator(colors);
+        final ConfettoGenerator generator = getDefaultGenerator(colors, shape);
 
         confettiManager = new ConfettiManager(context, generator, confettiSource, container)
                 .setVelocityX(0, defaultVelocitySlow)
@@ -156,9 +171,9 @@ public class CommonConfetti {
                 .setTargetRotationalVelocity(360);
     }
 
-    private void configureExplosion(ViewGroup container, int x, int y, int[] colors) {
+    private void configureExplosion(ViewGroup container, int x, int y, int[] colors, Shape shape) {
         final Context context = container.getContext();
-        final ConfettoGenerator generator = getDefaultGenerator(colors);
+        final ConfettoGenerator generator = getDefaultGenerator(colors, shape);
         final ConfettiSource confettiSource = new ConfettiSource(x, y);
 
         confettiManager = new ConfettiManager(context, generator, confettiSource, container)
