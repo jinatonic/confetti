@@ -580,7 +580,7 @@ public class ConfettiManager {
                 final int numNewConfetti = (int)
                         (random.nextFloat() * emissionRate * timeSinceLastEmission);
                 if (numNewConfetti > 0) {
-                    lastEmittedTimestamp += emissionRateInverse * numNewConfetti;
+                    lastEmittedTimestamp += Math.round(emissionRateInverse * numNewConfetti);
                     addNewConfetti(numNewConfetti, elapsedTime);
                 }
             }
