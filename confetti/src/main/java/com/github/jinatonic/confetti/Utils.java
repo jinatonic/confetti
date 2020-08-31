@@ -44,12 +44,18 @@ public class Utils {
         return defaultAlphaInterpolator;
     }
 
-    public static List<Bitmap> generateConfettiBitmaps(int[] colors, int size) {
+    public static List<Bitmap> generateConfettiBitmaps(int[] colors, int size, Shape shape) {
         final List<Bitmap> bitmaps = new ArrayList<>();
         for (int color : colors) {
-            bitmaps.add(createCircleBitmap(color, size));
-            bitmaps.add(createSquareBitmap(color, size));
-            bitmaps.add(createTriangleBitmap(color, size));
+            if (shape == Shape.MIXED || shape == null) {
+                bitmaps.add(createCircleBitmap(color, size));
+                bitmaps.add(createSquareBitmap(color, size));
+                bitmaps.add(createTriangleBitmap(color, size));
+            }
+
+            if (shape == Shape.CIRCLE) bitmaps.add(createCircleBitmap(color, size));
+            if (shape == Shape.SQUARE) bitmaps.add(createSquareBitmap(color, size));
+            if (shape == Shape.TRIANGLE) bitmaps.add(createTriangleBitmap(color, size));
         }
         return bitmaps;
     }
